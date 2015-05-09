@@ -14,7 +14,7 @@ public class Satisficer extends GraphicsProgram {
 	
 	public void run() {
 		
-		setSize(1800, 600);
+		setSize(1800, 500);
 		GRect lab = new GRect(20,10,100,100);
 		lab.setFillColor(Color.RED);
 		lab.setFilled(true);
