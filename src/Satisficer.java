@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 
 public class Satisficer extends GraphicsProgram {
 	
-	
 	Vector<Room> rooms = new Vector<Room>();
 	Floorplan floor = null;
 	int WINDOW_WIDTH = 1800;
@@ -27,35 +26,14 @@ public class Satisficer extends GraphicsProgram {
 		floor = new Floorplan();
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
-		
-		Room room = new Room(100,100, RoomType.EXAM);
-		room.setLocation(20,10);
-	    add(room);
-	    rooms.add(room);
 	    
-	    Room room2 = new Room(100,100, RoomType.LAB);
-	    room2.setLocation(120,10);
-	    add(room2);
-	    rooms.add(room2);
-	    
-	    //I am not sure how to place buttons in the graphics window.  This code makes GIANT buttons :(
-	    //You have to resize window for buttons to appear
-	    JButton b1 = new JButton("Add lab");
-	    b1.setVerticalTextPosition(AbstractButton.CENTER);
-	    b1.setHorizontalTextPosition(AbstractButton.LEADING); //aka LEFT, for left-to-right locales
-	    //b1.setMnemonic(KeyEvent.VK_D);
-	    b1.setActionCommand("Add lab");
-	    b1.addActionListener(this);
-	    add(b1);
-	   
-	    JButton b2 = new JButton("Add exam");
-	    b2.setVerticalTextPosition(AbstractButton.CENTER);
-	    b2.setHorizontalTextPosition(AbstractButton.LEADING); //aka LEFT, for left-to-right locales
-	    //b2.setMnemonic(KeyEvent.VK_D);
-	    b2.setActionCommand("Add exam");
-	    b2.addActionListener(this);
-	    add(b2);
-	    
+	    int i = 0;
+	    for(RoomType type: RoomType.values()){
+		   Button b1 = new Button(100.0, 50.0, type);
+		    b1.setLocation(10 + i, WINDOW_HEIGHT - 75);
+		    add(b1);
+		    i += 110;
+	    }
 	    
 	    add(score);
 		
@@ -63,19 +41,7 @@ public class Satisficer extends GraphicsProgram {
 		addMouseListeners();
 	}
 	
-	//Adds rooms based on buttons clicked
-	public void actionPerformed(ActionEvent e) {
-		Room room = null;
-	    if ("Add lab".equals(e.getActionCommand())) {
-			room = new Room(100, 100, RoomType.LAB);
-	    }
-	    if ("Add exam".equals(e.getActionCommand())) {
-	    	room = new Room(100, 100, RoomType.EXAM);
-	 	}
-	    room.setLocation(20,10);
-	    add(room);
-	    rooms.add(room);
-	}
+
 	
 	//Globals shared between Mouse events
 	Room selectedRoom = null;
@@ -83,9 +49,24 @@ public class Satisficer extends GraphicsProgram {
 	boolean resizing = false;
 	double initialX = 0;
 	double initialY = 0;
+	double pressX = 0;
+	double pressY = 0;
 	boolean moving = false;
 	boolean rotating = false;
 	//boolean rotating = false;
+	
+	public void mouseClicked(MouseEvent e){
+		if (selectedObject instanceof Button){
+			pressButton();
+		}
+	}
+	
+	public void pressButton(){
+		Room room = new Room(100, 100, ((Button) selectedObject).type);;
+		room.setLocation(selectedObject.getX(),selectedObject.getY()-room.getHeight()-10);
+		add(room);
+		rooms.add(room);
+	}
 	
 	//Records the object selected, and if the resize box is selected
 	public void mousePressed(MouseEvent e){
@@ -93,11 +74,6 @@ public class Satisficer extends GraphicsProgram {
 		moving = false;
 		rotating = false;
 		selectedObject = getElementAt(e.getX(),e.getY());
-		
-		if (selectedObject instanceof Floorplan){
-			selectedObject = null;
-			return;
-		}
 		
 		if (selectedObject instanceof Room){
 			Room room = (Room) selectedObject;
@@ -116,14 +92,22 @@ public class Satisficer extends GraphicsProgram {
 				remove(selectedObject);
 			} else {
 				moving = true;
+				pressX = e.getX();
+				pressY = e.getY();
 			}
+		} else if (!(selectedObject instanceof Button)){
+			selectedObject = null;
 		}
 	}
 
 	//Moves or resizes object
 	public void mouseDragged(MouseEvent e){
 		if(selectedObject == null) return;
-		if(moving) selectedObject.setLocation(e.getX(),e.getY());
+		if(moving) {
+			selectedObject.move(e.getX()-pressX,e.getY()-pressY);
+			pressX = e.getX();
+			pressY = e.getY();
+		}
 		if(resizing) {
 			((Room)selectedObject).resize(initialX, initialY, e.getX(),e.getY());
 		}
@@ -143,6 +127,7 @@ public class Satisficer extends GraphicsProgram {
 		//System.out.println(distance(rooms.elementAt(0),rooms.elementAt(1)));
 		//printScore();
 	}
+	
 	/*
 	// Dustin: Just testing a sample constraint
 	private void printScore(){
@@ -167,3 +152,35 @@ public class Satisficer extends GraphicsProgram {
 		return Math.sqrt(Math.pow(xDiff1,2) + Math.pow(xDiff2,2) + Math.pow(yDiff1,2) + Math.pow(yDiff2,2));
 	}
 }
+
+//I am not sure how to place buttons in the graphics window.  This code makes GIANT buttons :(
+//You have to resize window for buttons to appear
+/*JButton b1 = new JButton("Add lab");
+b1.setVerticalTextPosition(AbstractButton.CENTER);
+b1.setHorizontalTextPosition(AbstractButton.LEADING); //aka LEFT, for left-to-right locales
+//b1.setMnemonic(KeyEvent.VK_D);
+b1.setActionCommand("Add lab");
+b1.addActionListener(this);
+add(b1);
+
+JButton b2 = new JButton("Add exam");
+b2.setVerticalTextPosition(AbstractButton.CENTER);
+b2.setHorizontalTextPosition(AbstractButton.LEADING); //aka LEFT, for left-to-right locales
+//b2.setMnemonic(KeyEvent.VK_D);
+b2.setActionCommand("Add exam");
+b2.addActionListener(this);
+add(b2);*/
+
+//Adds rooms based on buttons clicked
+//public void actionPerformed(ActionEvent e) {
+//	Room room = null;
+//    if ("Add lab".equals(e.getActionCommand())) {
+//		room = new Room(100, 100, RoomType.LAB);
+//    }
+//    if ("Add exam".equals(e.getActionCommand())) {
+//    	room = new Room(100, 100, RoomType.EXAM);
+// 	}
+//    room.setLocation(20,10);
+//    add(room);
+//    rooms.add(room);
+//}

@@ -6,11 +6,11 @@ import acm.graphics.*;
 public class Floorplan extends GCompound {
 
 	GPoint[] vertices = {new GPoint(0,0),
-			new GPoint(0,300),
-			new GPoint(300,300),
-			new GPoint(300, 500),
+			new GPoint(0,500),
 			new GPoint(500,500),
-			new GPoint(500,0)};
+			new GPoint(500, 260),
+			new GPoint(260,260),
+			new GPoint(260,0)};
 	
 	double CELL_WIDTH = 20;
 	
@@ -37,12 +37,24 @@ public class Floorplan extends GCompound {
 		add(new GLine(x,y+height,x+width,y+height));
 	}
 	
+	//snaps to closest grid square
 	public GPoint snapToGrid(GPoint pt){
 		double x = getX();
 		double y = getY();
 		int cx = (int) ((pt.getX() - x)/CELL_WIDTH);
 		int cy = (int) ((pt.getY() - y)/CELL_WIDTH);
+		if(pt.getX() - (x + cx*CELL_WIDTH) > CELL_WIDTH/2) cx++;
+		if(pt.getY() - (y + cy*CELL_WIDTH) > CELL_WIDTH/2) cy++;
 		return new GPoint(x + cx*CELL_WIDTH, y + cy*CELL_WIDTH);
 	}
+	
+	//Snaps to upper left corner of closest grid square
+//	public GPoint snapToGrid(GPoint pt){
+//		double x = getX();
+//		double y = getY();
+//		int cx = (int) ((pt.getX() - x)/CELL_WIDTH);
+//		int cy = (int) ((pt.getY() - y)/CELL_WIDTH);
+//		return new GPoint(x + cx*CELL_WIDTH, y + cy*CELL_WIDTH);
+//	}
 
 }

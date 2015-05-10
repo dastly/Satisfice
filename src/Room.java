@@ -32,7 +32,9 @@ public class Room extends GCompound {
 		add(lowerLeft);*/
 		
 		placeControls();
-		setType(type);
+		this.type = type;
+		room.setFillColor(type.color());
+		add(new GLabel(type.label(), 5, 15));
 		
 	}
 	
@@ -67,44 +69,11 @@ public class Room extends GCompound {
 		upperRight.setLocation(room.getWidth()-5,-5);
 	}
 	
-	private void setType(RoomType type){
-		this.type = type;
-		switch(type){
-			case LAB:
-				room.setFillColor(Color.BLUE);
-				name = "LAB";
-				break;
-			case EXEC:
-				room.setFillColor(Color.GREEN);
-				name = "EXEC";
-				break;
-			case EXAM:
-				room.setFillColor(Color.YELLOW);
-				name = "EXAM";
-				break;
-			case WAITING:
-				room.setFillColor(Color.ORANGE);
-				name = "WAITING";
-				break;
-			case STORAGE:
-				room.setFillColor(Color.GREEN);
-				name = "STORAGE";
-				break;
-			default:
-				room.setFillColor(Color.WHITE);
-		}
-		upperLeft = new GLabel(name, 5, 15);
-		add(upperLeft);
-	}
-	
 	private
-		String name = "";
 		RoomType type;
 		GRect room;
 		//GPolygon room; //if using rotate
 		ResizeBlock lowerRight;
 		RemoveCircle upperRight;
 		//RotateDiamond lowerLeft;
-		GLabel upperLeft;
-
 }
