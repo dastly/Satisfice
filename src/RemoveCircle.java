@@ -1,3 +1,10 @@
+
+/*
+ * File: RemoveCircle.java
+ * ----------------------
+ * No different from GOval. (Needed to use instanceof)
+ */
+
 import acm.graphics.GOval;
 
 

@@ -1,3 +1,10 @@
+
+/*
+ * File: ResizeBlock.java
+ * ----------------------
+ * No different from GRect. (Needed to use instanceof)
+ */
+
 import acm.graphics.GRect;
 
 

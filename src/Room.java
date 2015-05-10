@@ -1,19 +1,45 @@
+
+/*
+ * File: Room.java
+ * ---------------
+ * Currently, the room is a GRect.
+ * 
+ * If we want full rotation, it needs to be a GPolygon.
+ * Code is commented out for this implementation.
+ */
+
 import java.awt.Color;
 
 import acm.graphics.*;
 
 public class Room extends GCompound {
-
+	
+	double DEFAULT_WIDTH = 100.0;
+	double DEFAULT_HEIGHT = 100.0;
+	
+	public Room(RoomType type) {
+		createRoom(DEFAULT_WIDTH, DEFAULT_HEIGHT, type);
+	}
+	
 	public Room(double width, double height, RoomType type) {
+		createRoom(width, height, type);
+	}
+	
+	public void createRoom(double width, double height, RoomType type) {
+		
+		
+		room = new GRect(width, height);
 		
 		//Rotation requires polygons
 		/*GPoint[] vertices = {new GPoint(0,0), new GPoint(width,0), new GPoint(width,height), new GPoint(0,height)};
 		room = new GPolygon(vertices);*/
 		
-		room = new GRect(width, height);
+		
 		room.setFillColor(Color.BLUE);
 		room.setFilled(true);
 		add(room);
+		
+		
 		
 		lowerRight = new ResizeBlock(10,10);
 		lowerRight.setFillColor(Color.RED);
@@ -49,15 +75,16 @@ public class Room extends GCompound {
 	}
 
 	public void resize(double initialX, double initialY, double x, double y) {
-		//room.scale((x-initialX)/room.getWidth(), (y-initialY)/room.getHeight());
 		room.setSize(x-initialX,y-initialY);
+		//room.scale((x-initialX)/room.getWidth(), (y-initialY)/room.getHeight()); //GPolygon resize
 		placeControls();
 	}
 	
-	public void rotate(double theta) {
-		room.rotate(theta);
-		placeControls();
-	}
+//	GPolygon rotation
+//	public void rotate(double theta) {
+//		room.rotate(theta);
+//		placeControls();
+//	}
 	
 	public double getSqFootage(){
 		return room.getWidth()*room.getHeight();
@@ -65,15 +92,17 @@ public class Room extends GCompound {
 
 	private void placeControls() {
 		lowerRight.setLocation(room.getWidth()-5,room.getHeight()-5);
-		//lowerLeft.setLocation(0,room.getHeight());
 		upperRight.setLocation(room.getWidth()-5,-5);
+		//lowerLeft.setLocation(0,room.getHeight());
+		
 	}
 	
 	private
 		RoomType type;
 		GRect room;
-		//GPolygon room; //if using rotate
 		ResizeBlock lowerRight;
 		RemoveCircle upperRight;
+		
+		//GPolygon room; //if using rotate
 		//RotateDiamond lowerLeft;
 }

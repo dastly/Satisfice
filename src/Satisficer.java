@@ -1,4 +1,9 @@
 
+/*
+ * File: Satisficer.java
+ * ---------------------
+ * Sets up graphic applet and runs main program.
+ */
 
 import acm.graphics.*;
 import acm.gui.HPanel;
@@ -14,12 +19,26 @@ import javax.swing.JPanel;
 
 public class Satisficer extends GraphicsProgram {
 	
-	Vector<Room> rooms = new Vector<Room>();
-	Floorplan floor = null;
+	//Constants
 	int WINDOW_WIDTH = 1800;
 	int WINDOW_HEIGHT = 600;
-	GLabel score = new GLabel("Score: ", 20, 10);
+	int BUTTON_OFFSET_BOTTOM = 25;
+	int BUTTON_WIDTH = 100;
+	int BUTTON_HEIGHT = 50;
+	int BUTTON_SPACING = 10;
+	int ROOM_OFFSET_BOTTOM = 10;
 	
+	//Globals
+	Vector<Room> rooms = new Vector<Room>();
+	Floorplan floor = null;
+	GLabel score = null;
+	
+	/*
+	 * (non-Javadoc)
+	 * @see acm.program.GraphicsProgram#run()
+	 * --------------------------------------
+	 * Initializes window.  All other functionality handled by mouse/event listeners.
+	 */
 	public void run() {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		
@@ -27,48 +46,82 @@ public class Satisficer extends GraphicsProgram {
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
 	    
+		//Adds button for adding every type of room
 	    int i = 0;
 	    for(RoomType type: RoomType.values()){
-		   Button b1 = new Button(100.0, 50.0, type);
-		    b1.setLocation(10 + i, WINDOW_HEIGHT - 75);
+		   Button b1 = new Button(BUTTON_WIDTH, BUTTON_HEIGHT, type);
+		    b1.setLocation(BUTTON_SPACING + i, WINDOW_HEIGHT - BUTTON_HEIGHT - BUTTON_OFFSET_BOTTOM);
 		    add(b1);
-		    i += 110;
+		    i += BUTTON_WIDTH + BUTTON_SPACING;
 	    }
 	    
+	    score = new GLabel("Score: ", 20, 10);
 	    add(score);
 		
 		//printScore();
 		addMouseListeners();
 	}
 	
-
-	
 	//Globals shared between Mouse events
 	Room selectedRoom = null;
 	GObject selectedObject = null;
-	boolean resizing = false;
-	double initialX = 0;
-	double initialY = 0;
-	double pressX = 0;
-	double pressY = 0;
+	
+	double initialX; //Initial location or room
+	double initialY;
+	double pressX; //Where cursor was pressed
+	double pressY;
+	
 	boolean moving = false;
+	boolean resizing = false;
 	boolean rotating = false;
-	//boolean rotating = false;
+	
+	/*
+	 * EventHandler: mouseClicked(...)
+	 * ----------------------
+	 * Runs action for buttons or DeleteCircles (remove room).
+	 */
 	
 	public void mouseClicked(MouseEvent e){
-		if (selectedObject instanceof Button){
+		if (selectedObject instanceof Button){	//selectedObject set by mousePressed(...).
 			pressButton();
+		}
+		if (selectedObject instanceof Room){
+			Room room = (Room) selectedObject;
+			GPoint pt = room.getLocalPoint(e.getX(),e.getY());
+			GObject selectedInnerObject = room.getElementAt(pt.getX(),pt.getY());
+			if (selectedInnerObject instanceof RemoveCircle){
+				rooms.remove((Room)selectedObject);
+				remove(selectedObject);
+			}
 		}
 	}
 	
+	/*
+	 * Function: pressButton()
+	 * ----------------------
+	 * Creates a room of the type specified by the button, placing it above the button.
+	 * Adds room to room list.
+	 */
+	
 	public void pressButton(){
-		Room room = new Room(100, 100, ((Button) selectedObject).type);;
-		room.setLocation(selectedObject.getX(),selectedObject.getY()-room.getHeight()-10);
+		Room room = new Room(((Button) selectedObject).type);
+		room.setLocation(selectedObject.getX(),selectedObject.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 		add(room);
 		rooms.add(room);
 	}
 	
-	//Records the object selected, and if the resize box is selected
+	/*
+	 * EventHandler: mousePressed(...)
+	 * ----------------------
+	 * Records which item is pressed, if it is a Room or Button.
+	 * 
+	 * Different modes are set for different parts of a Room pressed.
+	 * Room 		-> 	moving
+	 * ResizeBlock 	-> 	resizing
+	 * RotateDiamond -> rotating 
+	 * 
+	 * Button actions and RemoveCircle action handled by clicks only.
+	 */
 	public void mousePressed(MouseEvent e){
 		resizing = false;
 		moving = false;
@@ -87,10 +140,7 @@ public class Satisficer extends GraphicsProgram {
 				rotating = true;
 				initialX = room.getX();
 				initialY = room.getY();
-			} else if (selectedInnerObject instanceof RemoveCircle){
-				rooms.remove((Room)selectedObject);
-				remove(selectedObject);
-			} else {
+			} else if (selectedInnerObject instanceof GRect) {
 				moving = true;
 				pressX = e.getX();
 				pressY = e.getY();
@@ -100,7 +150,13 @@ public class Satisficer extends GraphicsProgram {
 		}
 	}
 
-	//Moves or resizes object
+	/*
+	 * EventHandler: mouseDragged(...)
+	 * ----------------------
+	 * Moves, resizes, or rotates, based on mode set.
+	 * 
+	 * Should also update visualization.
+	 */
 	public void mouseDragged(MouseEvent e){
 		if(selectedObject == null) return;
 		if(moving) {
@@ -111,12 +167,19 @@ public class Satisficer extends GraphicsProgram {
 		if(resizing) {
 			((Room)selectedObject).resize(initialX, initialY, e.getX(),e.getY());
 		}
+		// Not working very well (so I made RotateDiamond currently invisible)
 		if(rotating){
 			((Room)selectedObject).rotate(Math.tan((e.getX()-initialX)/(e.getY()-initialY)));
 		}
 	}
 
-	//Snaps object to grid when moved or resized
+	/*
+	 * EventHandler: mouseReleased(...)
+	 * ----------------------
+	 * Snaps room to grid after resizing or moving.
+	 * 
+	 * Should also update visualization.
+	 */
 	public void mouseReleased(MouseEvent e){
 		//if(object != null) System.out.println(object.getX() - 10);
 		if(floor != null && selectedObject != null && moving) selectedObject.setLocation(floor.snapToGrid(selectedObject.getLocation()));
@@ -124,11 +187,35 @@ public class Satisficer extends GraphicsProgram {
 			GPoint pt = floor.snapToGrid(new GPoint(e.getX(),e.getY()));
 			((Room)selectedObject).resize(initialX, initialY, pt.getX(), pt.getY());
 		}
-		//System.out.println(distance(rooms.elementAt(0),rooms.elementAt(1)));
-		//printScore();
 	}
 	
 	/*
+	 * Function: distance(GPoint a, GPoint b)
+	 * ----------------------
+	 * Distance between points.
+	 */
+	private double distance(GPoint a, GPoint b){
+		return Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
+	}
+	
+	/*
+	 * Function: distance(Room a, Room b)
+	 * ----------------------
+	 * Distance between two rooms.
+	 * Equal to length or shortest line between them.
+	 */
+	private double distance(Room a, Room b){
+		double xDiff1 = Math.max(b.getX() - (a.getX() + a.getWidth()),0);
+		double xDiff2 = Math.max(a.getX() - (b.getX() + b.getWidth()),0);
+		double yDiff1 = Math.max(b.getY() - (a.getY() + a.getHeight()),0);
+		double yDiff2 = Math.max(a.getY() - (b.getY() + b.getHeight()),0);
+		return Math.sqrt(Math.pow(xDiff1,2) + Math.pow(xDiff2,2) + Math.pow(yDiff1,2) + Math.pow(yDiff2,2));
+	}
+}
+
+//////////OLD JUNK
+
+/*
 	// Dustin: Just testing a sample constraint
 	private void printScore(){
 		String scoreString =  "Score: ";
@@ -138,20 +225,6 @@ public class Satisficer extends GraphicsProgram {
 		scoreString += scoreNum;
 		score.setLabel(scoreString);
 	}*/
-	
-	private double distance(GPoint a, GPoint b){
-		return Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
-	}
-	
-	//Gives distance between two rooms.  Equals length of shortest line connecting the two rooms.
-	private double distance(Room a, Room b){
-		double xDiff1 = Math.max(b.getX() - (a.getX() + a.getWidth()),0);
-		double xDiff2 = Math.max(a.getX() - (b.getX() + b.getWidth()),0);
-		double yDiff1 = Math.max(b.getY() - (a.getY() + a.getHeight()),0);
-		double yDiff2 = Math.max(a.getY() - (b.getY() + b.getHeight()),0);
-		return Math.sqrt(Math.pow(xDiff1,2) + Math.pow(xDiff2,2) + Math.pow(yDiff1,2) + Math.pow(yDiff2,2));
-	}
-}
 
 //I am not sure how to place buttons in the graphics window.  This code makes GIANT buttons :(
 //You have to resize window for buttons to appear
