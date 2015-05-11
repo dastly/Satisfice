@@ -39,8 +39,6 @@ public class Room extends GCompound {
 		room.setFilled(true);
 		add(room);
 		
-		
-		
 		lowerRight = new ResizeBlock(10,10);
 		lowerRight.setFillColor(Color.RED);
 		lowerRight.setFilled(true);
@@ -61,6 +59,8 @@ public class Room extends GCompound {
 		this.type = type;
 		room.setFillColor(type.color());
 		add(new GLabel(type.label(), 5, 15));
+		size = new GLabel(getSqFootage() + "ft.^2", 5, 25);
+		add(size);
 		
 	}
 	
@@ -74,10 +74,11 @@ public class Room extends GCompound {
 		return room.getHeight();
 	}
 
-	public void resize(double initialX, double initialY, double x, double y) {
-		room.setSize(x-initialX,y-initialY);
+	public void resize(double deltaX, double deltaY) {
+		room.setSize(room.getWidth() + deltaX, room.getHeight() + deltaY);
 		//room.scale((x-initialX)/room.getWidth(), (y-initialY)/room.getHeight()); //GPolygon resize
 		placeControls();
+		size.setLabel(getSqFootage() + "ft.^2");
 	}
 	
 //	GPolygon rotation
@@ -87,7 +88,15 @@ public class Room extends GCompound {
 //	}
 	
 	public double getSqFootage(){
-		return room.getWidth()*room.getHeight();
+		return (room.getWidth()*room.getHeight())/400.0*25.0;
+	}
+	
+	public void highlight(){
+		room.setColor(Color.YELLOW);
+	}
+	
+	public void unhighlight(){
+		room.setColor(Color.BLACK);
 	}
 
 	private void placeControls() {
@@ -102,6 +111,7 @@ public class Room extends GCompound {
 		GRect room;
 		ResizeBlock lowerRight;
 		RemoveCircle upperRight;
+		GLabel size;
 		
 		//GPolygon room; //if using rotate
 		//RotateDiamond lowerLeft;

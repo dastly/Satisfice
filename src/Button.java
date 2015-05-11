@@ -11,7 +11,7 @@ public class Button extends GCompound {
 		shape.setFillColor(type.color());
 		shape.setFilled(true);
 		add(shape);
-		add(new GLabel(type.label(), 5, 15), 5, 15);
+		add(new GLabel("ADD " + type.label(), 5, 15), 5, 15);
 	}
 	
 	public
