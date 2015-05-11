@@ -11,8 +11,12 @@ import acm.program.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -41,6 +45,17 @@ public class Satisficer extends GraphicsProgram {
 	 */
 	public void run() {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+		
+//		Example photo reading
+//		BufferedImage img = null;
+//		try {
+//			    img = ImageIO.read(new File("Captured.PNG"));
+//		} catch (IOException e) {
+//		}
+//		GImage im = new GImage(img);
+//		add(im);
+		
+		
 		
 		floor = new Floorplan();
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
