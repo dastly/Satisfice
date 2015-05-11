@@ -325,7 +325,7 @@ public class Satisficer extends GraphicsProgram {
 }
 
 //////////OLD JUNK
-
+// trying out GitHub
 /*
 	// Dustin: Just testing a sample constraint
 	private void printScore(){
