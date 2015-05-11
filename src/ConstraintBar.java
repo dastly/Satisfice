@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 
 public class ConstraintBar extends GCompound {
 	
-	int BAR_HEIGHT = 400;
+	int BAR_HEIGHT = 500;
 	int BAR_WIDTH = 60;
 	int BAR_X = 100;
 	int BAR_Y = 60;
