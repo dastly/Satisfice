@@ -8,6 +8,7 @@
 import acm.graphics.*;
 import acm.gui.HPanel;
 import acm.program.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -35,6 +36,7 @@ public class Satisficer extends GraphicsProgram {
 	//Globals
 	Vector<Room> rooms = new Vector<Room>();
 	Floorplan floor = null;
+	ConstraintBar bar = null;
 	GLabel score = null;
 	
 	/*
@@ -58,6 +60,10 @@ public class Satisficer extends GraphicsProgram {
 		floor = new Floorplan();
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
+		
+		bar = new ConstraintBar(10, 5); // ConstraintBar takes in #total soft constraints, #total hard constraints
+		add(bar);
+		
 	    
 		//Adds button for adding every type of room
 	    int i = 0;
