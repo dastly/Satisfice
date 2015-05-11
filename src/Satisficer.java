@@ -32,6 +32,7 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_HEIGHT = 50;
 	int BUTTON_SPACING = 10;
 	int ROOM_OFFSET_BOTTOM = 10;
+	double PXL_TO_FT = 25.0/400.0; //Also in Room.java
 	
 	//Globals
 	Vector<Room> rooms = new Vector<Room>();
@@ -218,6 +219,8 @@ public class Satisficer extends GraphicsProgram {
 		}
 		pressX = e.getX();
 		pressY = e.getY();
+//		bar.setSoftSatisfied(TODO);
+//		bar.setHardSatisfied(TODO);
 	}
 
 	/*
@@ -257,18 +260,46 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		
+//		bar.setSoftSatisfied(TODO);
+//		bar.setHardSatisfied(TODO);
 	}
 	
+	//TODO
+	double ADJACENCY_THRESHOLD = 20.0;
 	public double computeAdjacencyScore(){
+		int adjacencies = 0;
+		int adjacencyScore = 0;
 		for(int i = 0; i < rooms.size(); i++){
-			for(int j = 0; j < rooms.size(); j++){
+			for(int j = i+1; j < rooms.size(); j++){
+				if(distance(rooms.elementAt(i),rooms.elementAt(j)) <= ADJACENCY_THRESHOLD){
+					adjacencies++;
+					adjacencyScore += affinity(rooms.elementAt(i), rooms.elementAt(j));
+				}
+			}
+		}
+		return 0.0;
+	}
+	
+	//TODO
+	double computeRoomSizeScore(){
+		for(Room room: rooms){
+			if(room.getSqFootage() < PXL_TO_FT * room.getType().width()*room.getType().height()){
 				
 			}
 		}
 		return 0.0;
 	}
 	
+	//TODO
+	double computeRoomCountScore(){
+		return 0.0;
+	}
 	
+	//TODO	
+	private int affinity(Room a, Room b) {
+		return 0;
+	}
+
 	/*
 	 * Function: distance(GPoint a, GPoint b)
 	 * ----------------------

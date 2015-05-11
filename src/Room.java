@@ -16,6 +16,7 @@ public class Room extends GCompound {
 	
 	double DEFAULT_WIDTH = 100.0;
 	double DEFAULT_HEIGHT = 100.0;
+	double PXL_TO_FT = 25.0/400.0;
 	
 	public Room(RoomType type) {
 		createRoom(DEFAULT_WIDTH, DEFAULT_HEIGHT, type);
@@ -88,7 +89,7 @@ public class Room extends GCompound {
 //	}
 	
 	public double getSqFootage(){
-		return (room.getWidth()*room.getHeight())/400.0*25.0;
+		return (room.getWidth()*room.getHeight())*PXL_TO_FT;
 	}
 	
 	public void highlight(){
@@ -104,6 +105,10 @@ public class Room extends GCompound {
 		upperRight.setLocation(room.getWidth()-5,-5);
 		//lowerLeft.setLocation(0,room.getHeight());
 		
+	}
+	
+	public RoomType getType(){
+		return type;
 	}
 	
 	private
