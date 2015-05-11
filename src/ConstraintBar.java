@@ -35,8 +35,6 @@ public class ConstraintBar extends GCompound {
 	
 	public ConstraintBar(double totalSoft, double totalHard) {
 		bar = new GRect(BAR_X, BAR_Y, BAR_WIDTH, BAR_HEIGHT);
-		//bar.setFillColor(Color.BLUE);
-		//bar.setFilled(true);
 		paint(bar);
 		soft = new GLabel("SOFT", BAR_X-50, BAR_HEIGHT+BAR_Y);
 		hard = new GLabel("HARD", BAR_WIDTH+BAR_X+20, BAR_HEIGHT+BAR_Y);
