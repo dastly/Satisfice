@@ -36,13 +36,13 @@ public class Satisficer extends GraphicsProgram {
 	int ROOM_OFFSET_BOTTOM = 10;
 	double PXL_TO_FT = 25.0/400.0; //Also in Room.java
 	int affinityMatrix[][] = {
-		      { 0, -2, -2, 1, -2, -2, -1},
-		      {-2, 0, -1, 1, 2, 2, 0},
-		      {-2, 1, 0, 2, 2, 2, 0},
-		      {1,1,2,0,2,2,0},
-		      {-2,2,2,2,0,2,0},
-		      {-2,2,2,2,2,0,0},
-		      {-1,-1,0,0,0,0,0}
+		      { 0, -2, -2,  1, -2, -2, -1},
+		      {-2,  0, -1,  1,  2,  2,  0},
+		      {-2,  1,  0,  2,  2,  2,  0},
+		      { 1,  1,  2,  0,  2,  2,  0},
+		      {-2,  2,  2,  2,  0,  2,  0},
+		      {-2,  2,  2,  2,  2,  0,  0},
+		      {-1, -1,  0,  0,  0,  0,  0}
 	};
 	
 	//Globals
@@ -133,6 +133,7 @@ public class Satisficer extends GraphicsProgram {
 				}
 			}
 		}
+		computeScores();
 	}
 	
 	/*
@@ -238,8 +239,7 @@ public class Satisficer extends GraphicsProgram {
 		}
 		pressX = e.getX();
 		pressY = e.getY();
-		bar.setSoftSatisfied(computeAdjacencyScore());
-//		bar.setHardSatisfied(TODO);
+		computeScores();
 	}
 
 	/*
@@ -278,7 +278,10 @@ public class Satisficer extends GraphicsProgram {
 				}
 			}
 		}
-		
+		computeScores();
+	}
+	
+	private void computeScores() {
 		bar.setSoftSatisfied(computeAdjacencyScore());
 //		bar.setHardSatisfied(TODO);
 	}
