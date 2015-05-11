@@ -26,7 +26,7 @@ public class Satisficer extends GraphicsProgram {
 	
 	//Constants
 	int WINDOW_WIDTH = 1800;
-	int WINDOW_HEIGHT = 600;
+	int WINDOW_HEIGHT = 700;
 	int BAR_X = 100;
 	int BAR_Y = 60;
 	int BUTTON_OFFSET_BOTTOM = 25;
