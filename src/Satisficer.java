@@ -53,9 +53,7 @@ public class Satisficer extends GraphicsProgram {
 //		} catch (IOException e) {
 //		}
 //		GImage im = new GImage(img);
-//		add(im);
-		
-		
+//		add(im);		
 		
 		floor = new Floorplan();
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
@@ -254,6 +252,16 @@ public class Satisficer extends GraphicsProgram {
 		}
 		
 	}
+	
+	public double computeAdjacencyScore(){
+		for(int i = 0; i < rooms.size(); i++){
+			for(int j = 0; j < rooms.size(); j++){
+				
+			}
+		}
+		return 0.0;
+	}
+	
 	
 	/*
 	 * Function: distance(GPoint a, GPoint b)
