@@ -63,17 +63,17 @@ public class Satisficer extends GraphicsProgram {
 	}
 	
 	//Globals shared between Mouse events
-	Room selectedRoom = null;
-	GObject selectedObject = null;
+	GObject selected = null;
+	Vector<Room> selectedRooms = new Vector<Room>();
+	GRect groupSelector = null;
 	
-	double initialX; //Initial location or room
-	double initialY;
 	double pressX; //Where cursor was pressed
 	double pressY;
 	
 	boolean moving = false;
 	boolean resizing = false;
 	boolean rotating = false;
+	boolean selecting = false;
 	
 	/*
 	 * EventHandler: mouseClicked(...)
@@ -82,30 +82,33 @@ public class Satisficer extends GraphicsProgram {
 	 */
 	
 	public void mouseClicked(MouseEvent e){
-		if (selectedObject instanceof Button){	//selectedObject set by mousePressed(...).
-			pressButton();
+		if (selected instanceof Button){	//selected set by mousePressed(...).
+			pressButton((Button) selected);
 		}
-		if (selectedObject instanceof Room){
-			Room room = (Room) selectedObject;
+		if (selected instanceof Room){
+			Room room = (Room) selected;
 			GPoint pt = room.getLocalPoint(e.getX(),e.getY());
 			GObject selectedInnerObject = room.getElementAt(pt.getX(),pt.getY());
 			if (selectedInnerObject instanceof RemoveCircle){
-				rooms.remove((Room)selectedObject);
-				remove(selectedObject);
+				for(Room sroom: selectedRooms){
+					rooms.remove(sroom);
+					remove(sroom);
+				}
 			}
 		}
 	}
 	
 	/*
-	 * Function: pressButton()
+	 * Function: pressButton(Button button)
 	 * ----------------------
 	 * Creates a room of the type specified by the button, placing it above the button.
 	 * Adds room to room list.
 	 */
 	
-	public void pressButton(){
-		Room room = new Room(((Button) selectedObject).type);
-		room.setLocation(selectedObject.getX(),selectedObject.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
+	public void pressButton(Button button){
+		RoomType type = button.type;
+		Room room = new Room(type.width(), type.height(), type);
+		room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 		add(room);
 		rooms.add(room);
 	}
@@ -115,38 +118,52 @@ public class Satisficer extends GraphicsProgram {
 	 * ----------------------
 	 * Records which item is pressed, if it is a Room or Button.
 	 * 
-	 * Different modes are set for different parts of a Room pressed.
+	 * Different modes are set.
 	 * Room 		-> 	moving
 	 * ResizeBlock 	-> 	resizing
 	 * RotateDiamond -> rotating 
+	 * Outside 		-> selecting
 	 * 
 	 * Button actions and RemoveCircle action handled by clicks only.
 	 */
 	public void mousePressed(MouseEvent e){
+		
 		resizing = false;
 		moving = false;
 		rotating = false;
-		selectedObject = getElementAt(e.getX(),e.getY());
+		selecting = false;
+		pressX = e.getX();
+		pressY = e.getY();
 		
-		if (selectedObject instanceof Room){
-			Room room = (Room) selectedObject;
+		selected = getElementAt(e.getX(),e.getY());
+		if(selected instanceof Button) return;
+		if(selected instanceof Room){
+			Room room = (Room) selected;
 			GPoint pt = room.getLocalPoint(e.getX(),e.getY());
 			GObject selectedInnerObject = room.getElementAt(pt.getX(),pt.getY());
 			if(selectedInnerObject instanceof ResizeBlock){
 				resizing = true;
-				initialX = room.getX();
-				initialY = room.getY();
 			} else if (selectedInnerObject instanceof RotateDiamond){
 				rotating = true;
-				initialX = room.getX();
-				initialY = room.getY();
 			} else if (selectedInnerObject instanceof GRect) {
 				moving = true;
-				pressX = e.getX();
-				pressY = e.getY();
+			}// else if (selectedInnerObject instanceof RemoveCircle) return;
+			if(!selectedRooms.contains(room)){
+				for(Room sroom: selectedRooms){
+					sroom.unhighlight();
+				}
+				selectedRooms.clear();
+				selectedRooms.add(room);
+				room.highlight();
 			}
-		} else if (!(selectedObject instanceof Button)){
-			selectedObject = null;
+		} else {
+			for(Room sroom: selectedRooms){
+				sroom.unhighlight();
+			}
+			selectedRooms.clear();
+			groupSelector = new GRect(e.getX(), e.getY(), 0, 0);
+			add(groupSelector);
+			selecting = true;
 		}
 	}
 
@@ -158,19 +175,30 @@ public class Satisficer extends GraphicsProgram {
 	 * Should also update visualization.
 	 */
 	public void mouseDragged(MouseEvent e){
-		if(selectedObject == null) return;
+		double deltaX = e.getX() - pressX;
+		double deltaY = e.getY() - pressY;
+		//if(selectedObject == null) return;
 		if(moving) {
-			selectedObject.move(e.getX()-pressX,e.getY()-pressY);
-			pressX = e.getX();
-			pressY = e.getY();
+			for(Room room: selectedRooms){
+				room.move(deltaX,deltaY);
+			}
 		}
 		if(resizing) {
-			((Room)selectedObject).resize(initialX, initialY, e.getX(),e.getY());
+			for(Room room: selectedRooms){
+				room.resize(deltaX, deltaY);
+			}
 		}
 		// Not working very well (so I made RotateDiamond currently invisible)
 		if(rotating){
-			((Room)selectedObject).rotate(Math.tan((e.getX()-initialX)/(e.getY()-initialY)));
+			for(Room room: selectedRooms){
+				room.rotate(Math.tan((deltaX)/(deltaY)));
+			}
 		}
+		if(selecting){
+			groupSelector.setSize(groupSelector.getWidth() + deltaX, groupSelector.getHeight() + deltaY);
+		}
+		pressX = e.getX();
+		pressY = e.getY();
 	}
 
 	/*
@@ -182,11 +210,34 @@ public class Satisficer extends GraphicsProgram {
 	 */
 	public void mouseReleased(MouseEvent e){
 		//if(object != null) System.out.println(object.getX() - 10);
-		if(floor != null && selectedObject != null && moving) selectedObject.setLocation(floor.snapToGrid(selectedObject.getLocation()));
-		if(floor != null && selectedObject != null && resizing){
-			GPoint pt = floor.snapToGrid(new GPoint(e.getX(),e.getY()));
-			((Room)selectedObject).resize(initialX, initialY, pt.getX(), pt.getY());
+		
+		if(selecting){
+			for(Room room: rooms){
+				if(groupSelector.getBounds().intersects(room.getBounds())){
+					room.highlight();
+					selectedRooms.add(room);
+				}
+			}
+			remove(groupSelector);
+			groupSelector = null;
+		} else {
+			if(floor != null){
+				if(moving){
+					for(Room room: selectedRooms){
+						room.setLocation(floor.snapToGrid(room.getLocation()));
+					}
+				}
+				if(resizing){
+					GPoint pt = floor.snapToGrid(new GPoint(e.getX(),e.getY()));
+					double deltaX = pt.getX() - pressX;
+					double deltaY = pt.getY() - pressY;
+					for(Room room: selectedRooms){
+						room.resize(deltaX, deltaY);
+					}
+				}
+			}
 		}
+		
 	}
 	
 	/*
