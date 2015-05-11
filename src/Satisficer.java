@@ -62,7 +62,7 @@ public class Satisficer extends GraphicsProgram {
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
 		
-		bar = new ConstraintBar(10, 5); // ConstraintBar takes in #total soft constraints, #total hard constraints
+		bar = new ConstraintBar(10, 14); // ConstraintBar takes in #total soft constraints, #total hard constraints
 		add(bar);
 		
 	    
@@ -80,6 +80,8 @@ public class Satisficer extends GraphicsProgram {
 		
 		//printScore();
 		addMouseListeners();
+		
+		
 	}
 	
 	//Globals shared between Mouse events
@@ -113,6 +115,7 @@ public class Satisficer extends GraphicsProgram {
 				for(Room sroom: selectedRooms){
 					rooms.remove(sroom);
 					remove(sroom);
+					computeRoomCountScore();
 				}
 			}
 		}
@@ -131,6 +134,8 @@ public class Satisficer extends GraphicsProgram {
 		room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 		add(room);
 		rooms.add(room);
+		
+		computeRoomCountScore();
 	}
 	
 	/*
@@ -292,8 +297,77 @@ public class Satisficer extends GraphicsProgram {
 	
 	//TODO
 	double computeRoomCountScore(){
+		int totFaculty = 0;
+		int totMeeting = 0;
+		int totAuditorium = 0;
+		int totCafeteria = 0;
+		int totSmallC = 0;
+		int totLargeC = 0;
+		int totMEP = 0;
+		int countScore =0;
+		int maxScore =14;
+		for (Room room: rooms){
+			if (room.getType()==RoomType.FACULTY){
+				totFaculty++;
+			} else if (room.getType()==RoomType.MEETING){
+				totMeeting++;
+			} else if (room.getType()==RoomType.AUDITORIUM){
+				totAuditorium++;
+			} else if (room.getType()==RoomType.CAFETERIA){
+				totCafeteria++;
+			} else if (room.getType()==RoomType.SMALLCLASSROOM){
+				totSmallC++;
+			} else if (room.getType()==RoomType.LARGECLASSROOM){
+				totLargeC++;
+			} else if (room.getType()==RoomType.MEP){
+				totMEP++;
+			}
+		}
+		// Adding Faculty points
+		if (totFaculty>0&&totFaculty<5){
+			countScore++;
+		} else if (totFaculty>=5){
+			countScore=countScore+2;
+		}
+		//Adding Meeting points
+		if (totMeeting>0&&totMeeting<5){
+			countScore++;
+		} else if (totMeeting>=5){
+			countScore=countScore+2;
+		}
+		//Adding Auditorium points
+		if (totAuditorium==1){
+			countScore=countScore+2;
+		}
+		//Adding Cafeteria points
+		if (totCafeteria==1){
+			countScore=countScore+2;
+		}
+		// Adding Small Classroom points
+		if (totSmallC>0&&totSmallC<5){
+			countScore++;
+		} else if (totSmallC>=5){
+			countScore=countScore+2;
+		}
+		// Adding Large Classroom points
+		if (totLargeC>0&&totLargeC<2){
+			countScore++;
+		} else if (totLargeC>=2){
+			countScore=countScore+2;
+		}
+		//Adding MEP points
+		if (totMEP==1){
+			countScore=countScore+2;
+		}
+		int totalRoomScore = (countScore*100)/maxScore;
+		double hardHeight = totalRoomScore/2.0;
+		String labelscore = "Hard Score: " + totalRoomScore +"%";
+		
+		System.out.println(labelscore);
+		bar.setHardSatisfied(hardHeight);
 		return 0.0;
 	}
+
 	
 	//TODO	
 	private int affinity(Room a, Room b) {

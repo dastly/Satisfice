@@ -70,8 +70,11 @@ public class ConstraintBar extends GCompound {
 	}
 	
 	public void setHardSatisfied(double satisfied) {
-		hardSatisfied = satisfied;
-		hard.setLocation(BAR_WIDTH+BAR_X+20, getHardSatisfaction());
+		//hardSatisfied = satisfied;
+		//hard.setLocation(BAR_WIDTH+BAR_X+20, getHardSatisfaction());
+		hard.setLocation(BAR_WIDTH+BAR_X+20, BAR_Y+BAR_HEIGHT-(satisfied*10));
+		double totalScore=satisfied*2;
+		hard.setLabel("HARD: "+totalScore +"%");
 	}
 	
 	private double getSoftSatisfaction() {
