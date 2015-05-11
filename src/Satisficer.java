@@ -27,18 +27,32 @@ public class Satisficer extends GraphicsProgram {
 	//Constants
 	int WINDOW_WIDTH = 1800;
 	int WINDOW_HEIGHT = 600;
+	int BAR_X = 100;
+	int BAR_Y = 60;
 	int BUTTON_OFFSET_BOTTOM = 25;
 	int BUTTON_WIDTH = 100;
 	int BUTTON_HEIGHT = 50;
 	int BUTTON_SPACING = 10;
 	int ROOM_OFFSET_BOTTOM = 10;
 	double PXL_TO_FT = 25.0/400.0; //Also in Room.java
+	int affinityMatrix[][] = {
+		      { 0, -2, -2, 1, -2, -2, -1},
+		      {-2, 0, -1, 1, 2, 2, 0},
+		      {-2, 1, 0, 2, 2, 2, 0},
+		      {1,1,2,0,2,2,0},
+		      {-2,2,2,2,0,2,0},
+		      {-2,2,2,2,2,0,0},
+		      {-1,-1,0,0,0,0,0}
+	};
 	
 	//Globals
 	Vector<Room> rooms = new Vector<Room>();
 	Floorplan floor = null;
 	ConstraintBar bar = null;
 	GLabel score = null;
+	Vector<Constraint> affinityConstraints = new Vector<Constraint>();
+	
+	
 	
 	/*
 	 * (non-Javadoc)
@@ -48,6 +62,8 @@ public class Satisficer extends GraphicsProgram {
 	 */
 	public void run() {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+		
+		
 		
 //		Example photo reading
 //		BufferedImage img = null;
@@ -62,8 +78,9 @@ public class Satisficer extends GraphicsProgram {
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
 		
-		bar = new ConstraintBar(10, 5); // ConstraintBar takes in #total soft constraints, #total hard constraints
+		bar = new ConstraintBar(1, 1); // ConstraintBar takes in #total soft constraints, #total hard constraints
 		add(bar);
+		bar.setLocation(BAR_X, BAR_Y);
 		
 	    
 		//Adds button for adding every type of room
@@ -131,6 +148,8 @@ public class Satisficer extends GraphicsProgram {
 		room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 		add(room);
 		rooms.add(room);
+//		Constraint affinity = new Constraint(room);
+//		affinityConstraints.add(affinity);
 	}
 	
 	/*
@@ -219,7 +238,7 @@ public class Satisficer extends GraphicsProgram {
 		}
 		pressX = e.getX();
 		pressY = e.getY();
-//		bar.setSoftSatisfied(TODO);
+		bar.setSoftSatisfied(computeAdjacencyScore());
 //		bar.setHardSatisfied(TODO);
 	}
 
@@ -260,7 +279,7 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		
-//		bar.setSoftSatisfied(TODO);
+		bar.setSoftSatisfied(computeAdjacencyScore());
 //		bar.setHardSatisfied(TODO);
 	}
 	
@@ -277,7 +296,10 @@ public class Satisficer extends GraphicsProgram {
 				}
 			}
 		}
-		return 0.0;
+		System.out.println(adjacencies);
+		if(adjacencies == 0) return 0.5;
+		System.out.println("Score: " + ((double)adjacencyScore/(double)adjacencies + 2)/4.0);
+		return ((double)adjacencyScore/(double)adjacencies + 2)/4.0;
 	}
 	
 	//TODO
@@ -297,7 +319,7 @@ public class Satisficer extends GraphicsProgram {
 	
 	//TODO	
 	private int affinity(Room a, Room b) {
-		return 0;
+		return affinityMatrix[a.getType().index()][b.getType().index()];
 	}
 
 	/*

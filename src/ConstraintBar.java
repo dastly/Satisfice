@@ -21,8 +21,7 @@ public class ConstraintBar extends GCompound {
 	
 	int BAR_HEIGHT = 400;
 	int BAR_WIDTH = 60;
-	int BAR_X = 100;
-	int BAR_Y = 60;
+	
 	
 	GRect bar = null;
 	GLabel soft = null;
@@ -34,10 +33,10 @@ public class ConstraintBar extends GCompound {
 	double hardSatisfied = 0;
 	
 	public ConstraintBar(double totalSoft, double totalHard) {
-		bar = new GRect(BAR_X, BAR_Y, BAR_WIDTH, BAR_HEIGHT);
+		bar = new GRect(BAR_WIDTH, BAR_HEIGHT);
 		bar.setFillColor(Color.BLUE);
-		soft = new GLabel("SOFT", BAR_X-50, BAR_HEIGHT+BAR_Y);
-		hard = new GLabel("HARD", BAR_WIDTH+BAR_X+20, BAR_HEIGHT+BAR_Y);
+		soft = new GLabel("SOFT", -50, BAR_HEIGHT);
+		hard = new GLabel("HARD", BAR_WIDTH+20, BAR_HEIGHT);
 		totalSoftConstraints = totalSoft;
 		totalHardConstraints = totalHard;
 		
@@ -48,12 +47,12 @@ public class ConstraintBar extends GCompound {
 	
 	public void setSoftSatisfied(double satisfied) {
 		softSatisfied = satisfied;
-		soft.setLocation(BAR_X-50, getSoftSatisfaction());
+		soft.setLocation(-50, BAR_HEIGHT - getSoftSatisfaction());
 	}
 	
 	public void setHardSatisfied(double satisfied) {
 		hardSatisfied = satisfied;
-		hard.setLocation(BAR_WIDTH+BAR_X+20, getHardSatisfaction());
+		hard.setLocation(BAR_WIDTH+20, getHardSatisfaction());
 	}
 	
 	private double getSoftSatisfaction() {
