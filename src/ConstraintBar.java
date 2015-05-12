@@ -21,31 +21,29 @@ public class ConstraintBar extends GCompound {
 	
 	int BAR_HEIGHT = 500;
 	int BAR_WIDTH = 60;
-	
+	int FLAG_OFFSET = 10;
 	
 	GRect bar = null;
-	GLabel soft = null;
-	GLabel hard = null;
+	Vector<Flag> flags = null;
 	
 	double totalSoftConstraints = 0;
 	double totalHardConstraints = 0;
 	double softSatisfied = 0;
 	double hardSatisfied = 0;
 	
-	public ConstraintBar(double totalSoft, double totalHard) {
+	public ConstraintBar(Vector<Flag> flags) {
 		bar = new GRect(BAR_WIDTH, BAR_HEIGHT);
 		bar.setFillColor(Color.BLUE);
-		soft = new GLabel("SOFT", -50, BAR_HEIGHT);
-		hard = new GLabel("HARD", BAR_WIDTH+20, BAR_HEIGHT);
-
-		totalSoftConstraints = totalSoft;
-		totalHardConstraints = totalHard;
-		
 		add(bar);
-		add(soft);
-		add(hard);
 		paint(bar);
+		
+		this.flags = flags;
+		for(Flag flag: flags){
+			add(flag);
+		}
+		
 	}
+	
 	public void paint(GRect cBar) {
 	  Color color1 = Color.GREEN;
 	  Color color2 = Color.RED;
@@ -64,30 +62,77 @@ public class ConstraintBar extends GCompound {
           add(stepBar);
 	  }
 	}
-
-	public void setSoftSatisfied(double satisfied) {
-		softSatisfied = satisfied;
-		soft.setLocation(-75, BAR_HEIGHT - getSoftSatisfaction());
-		soft.setLabel("SOFT: " + satisfied);
+	
+	public void setFlags(){
+		for(Flag flag: flags){
+			if(flag instanceof SoftFlag){
+				setSoftFlag((SoftFlag) flag);
+			}
+			if(flag instanceof HardFlag){
+				setHardFlag((HardFlag) flag);
+			}
+		}
+		adjustOverlaps();
 	}
 	
-	public void setHardSatisfied(double satisfied) {
-		//hardSatisfied = satisfied;
-		//hard.setLocation(BAR_WIDTH+BAR_X+20, getHardSatisfaction());
-		hard.setLocation(BAR_WIDTH+20, BAR_HEIGHT-(satisfied*10));
-		double totalScore=satisfied*2;
-		hard.setLabel("HARD: "+totalScore +"%");
+	private void setSoftFlag(SoftFlag flag) {
+		double satisfaction = flag.satisfaction();
+		flag.setLabel(Math.floor(satisfaction * 100) / 100);
+		flag.setLocation(-FLAG_OFFSET - flag.getWidth(), BAR_HEIGHT*(1 - satisfaction));
 	}
 	
-	private double getSoftSatisfaction() {
-		double softSatisfaction = softSatisfied/totalSoftConstraints;
-		double softLabelPosition = softSatisfaction * BAR_HEIGHT;
-		return softLabelPosition;
+	private void setHardFlag(HardFlag flag) {
+		double satisfaction = flag.satisfaction();
+		flag.setLabel(Math.floor(satisfaction * 100) / 100);
+		flag.setLocation(BAR_WIDTH + FLAG_OFFSET, BAR_HEIGHT*(1 - satisfaction));
 	}
 	
-	private double getHardSatisfaction() {
-		double hardSatisfaction = hardSatisfied/totalHardConstraints;
-		double hardLabelPosition = hardSatisfaction * BAR_HEIGHT;
-		return hardLabelPosition;
+	private void adjustOverlaps(){
+		for(Flag flag1: flags){
+			for(Flag flag2: flags){
+				if(!flag1.equals(flag2) && flag1.getBounds().intersects(flag2.getBounds())){
+//					if(flag1 instanceof SoftFlag){ 
+//						flag1.move(- flag2.getWidth() - 1, 0);
+//					}
+//					if(flag1 instanceof HardFlag){
+//						flag1.move(flag2.getWidth() + 1, 0);
+//					}
+					flag1.move(0, flag2.getHeight() + 1);
+				}
+			}
+		}
 	}
+	
+	
+	
+	
+	
+	
+//	OLD JUNK
+	
+//	public void setSoftHeight(double satisfied) {
+//		softSatisfied = satisfied;
+//		soft.setLocation(-75, BAR_HEIGHT - getSoftSatisfaction());
+//		soft.setLabel("SOFT: " + satisfied);
+//	}
+	
+//	public void setHardHeight(double satisfied) {
+//		//hardSatisfied = satisfied;
+//		//hard.setLocation(BAR_WIDTH+BAR_X+20, getHardSatisfaction());
+//		hard.setLocation(BAR_WIDTH+20, BAR_HEIGHT-(satisfied*10));
+//		double totalScore=satisfied*2;
+//		hard.setLabel("HARD: "+totalScore +"%");
+//	}
+	
+//	private double getSoftSatisfaction() {
+//		double softSatisfaction = softSatisfied/totalSoftConstraints;
+//		double softLabelPosition = softSatisfaction * BAR_HEIGHT;
+//		return softLabelPosition;
+//	}
+	
+//	private double getHardSatisfaction() {
+//		double hardSatisfaction = hardSatisfied/totalHardConstraints;
+//		double hardLabelPosition = hardSatisfaction * BAR_HEIGHT;
+//		return hardLabelPosition;
+//	}
 }

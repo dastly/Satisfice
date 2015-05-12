@@ -8,6 +8,7 @@ public class SizeConstraint extends Constraint {
 		// TODO Auto-generated constructor stub
 	}
 	
+	//Evaluates to true of false
 	public boolean satisfied(){
 		Room room = getRoom();
 		return room.getSqFootage() >= PXL_TO_FT * room.getType().width()*room.getType().height();

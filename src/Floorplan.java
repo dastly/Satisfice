@@ -5,17 +5,22 @@ import acm.graphics.*;
 
 public class Floorplan extends GCompound {
 
-	GPoint[] vertices = {new GPoint(0,0),
-			new GPoint(0,500),
-			new GPoint(500,500),
-			new GPoint(500, 260),
-			new GPoint(260,260),
-			new GPoint(260,0)};
+	int FLOOR_WIDTH = 500;
+	int FLOOR_HEIGHT = 500;
+	int FLOOR_MID_WIDTH = 260;
+	int FLOOR_MID_HEIGHT = 260;
+	
+	GPoint[] vertices = {new GPoint(0, 0),
+			new GPoint(0, FLOOR_HEIGHT),
+			new GPoint(FLOOR_WIDTH, FLOOR_HEIGHT),
+			new GPoint(FLOOR_WIDTH, FLOOR_MID_HEIGHT),
+			new GPoint(FLOOR_MID_WIDTH, FLOOR_MID_HEIGHT),
+			new GPoint(FLOOR_MID_WIDTH, 0)};
 	
 	double CELL_WIDTH = 20;
 	
 	public Floorplan() {
-		GPolygon outline = new GPolygon(vertices);
+		outline = new GPolygon(vertices);
 		outline.setFillColor(Color.LIGHT_GRAY);
 		outline.setFilled(true);
 		add(outline);
@@ -56,5 +61,8 @@ public class Floorplan extends GCompound {
 //		int cy = (int) ((pt.getY() - y)/CELL_WIDTH);
 //		return new GPoint(x + cx*CELL_WIDTH, y + cy*CELL_WIDTH);
 //	}
+	
+	private
+		GPolygon outline;
 
 }

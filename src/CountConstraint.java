@@ -7,6 +7,7 @@ public class CountConstraint extends Constraint {
 		super(type);
 	}
 	
+	//Evaluates to a number between 0.0 and 2.0
 	public double evaluate(Vector<Room> rooms){
 		int count = 0;
 		for(Room room: rooms){

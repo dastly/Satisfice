@@ -35,24 +35,12 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_SPACING = 10;
 	int ROOM_OFFSET_BOTTOM = 10;
 	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java
-	int affinityMatrix[][] = {
-		      { 0, -2, -2,  1, -2, -2, -1},
-		      {-2,  0, -1,  1,  2,  2,  0},
-		      {-2,  1,  0,  2,  2,  2,  0},
-		      { 1,  1,  2,  0,  2,  2,  0},
-		      {-2,  2,  2,  2,  0,  2,  0},
-		      {-2,  2,  2,  2,  2,  0,  0},
-		      {-1, -1,  0,  0,  0,  0,  0}
-	};
 	
 	//Globals
 	Vector<Room> rooms = new Vector<Room>();
 	Vector<Button> buttons = new Vector<Button>();
 	Floorplan floor = null;
 	ConstraintBar bar = null;
-	Vector<Constraint> affinityConstraints = new Vector<Constraint>();
-	
-	
 	
 	/*
 	 * (non-Javadoc)
@@ -61,27 +49,12 @@ public class Satisficer extends GraphicsProgram {
 	 * Initializes window.  All other functionality handled by mouse/event listeners.
 	 */
 	public void run() {
-		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-		
-		
-		
-//		Example photo reading
-//		BufferedImage img = null;
-//		try {
-//			    img = ImageIO.read(new File("Captured.PNG"));
-//		} catch (IOException e) {
-//		}
-//		GImage im = new GImage(img);
-//		add(im);		
+		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);	
 		
 		floor = new Floorplan();
 		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
-		bar = new ConstraintBar(1, 1); // ConstraintBar takes in #total soft constraints, #total hard constraints
-		add(bar);
-		bar.setLocation(BAR_X, BAR_Y);
-		
-	    
+
 		//Adds button for adding every type of room
 	    int i = 0;
 	    for(RoomType type: RoomType.values()){
@@ -91,8 +64,23 @@ public class Satisficer extends GraphicsProgram {
 		   i += BUTTON_WIDTH + BUTTON_SPACING;
 		   buttons.add(button);
 	    }
-		addMouseListeners();
+	    
+		Vector<Flag> flags = new Vector<Flag>();
+		Flag soft = new SoftFlag("SOFT", buttons, rooms);
+		Flag hard = new HardFlag("HARD", buttons, rooms);
+		Flag selectedSoft = new SoftFlag("SelSoft", buttons, selectedRooms);
+		Flag selectedHard = new HardFlag("SelHard", buttons, selectedRooms);
+		flags.add(soft);
+		flags.add(hard);
+		flags.add(selectedSoft);
+		flags.add(selectedHard);
 		
+		bar = new ConstraintBar(flags); // ConstraintBar takes in #total soft constraints, #total hard constraints
+		add(bar);
+		bar.setLocation(BAR_X, BAR_Y);
+		bar.setFlags();
+		
+		addMouseListeners();
 		
 	}
 	
@@ -113,8 +101,7 @@ public class Satisficer extends GraphicsProgram {
 	 * EventHandler: mouseClicked(...)
 	 * ----------------------
 	 * Runs action for buttons or DeleteCircles (remove room).
-	 */
-	
+	 */	
 	public void mouseClicked(MouseEvent e){
 		if (selected instanceof Button){	//selected set by mousePressed(...).
 			pressButton((Button) selected);
@@ -127,11 +114,10 @@ public class Satisficer extends GraphicsProgram {
 				for(Room sroom: selectedRooms){
 					rooms.remove(sroom);
 					remove(sroom);
-					computeRoomCountScore();
 				}
 			}
 		}
-		computeScores();
+		bar.setFlags();
 	}
 	
 	/*
@@ -140,15 +126,13 @@ public class Satisficer extends GraphicsProgram {
 	 * Creates a room of the type specified by the button, placing it above the button.
 	 * Adds room to room list.
 	 */
-	
 	public void pressButton(Button button){
 		RoomType type = button.getType();
 		Room room = new Room(type.width(), type.height(), type);
 		room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 		add(room);
 		rooms.add(room);
-		
-		computeRoomCountScore();
+		bar.setFlags();
 	}
 	
 	/*
@@ -237,7 +221,7 @@ public class Satisficer extends GraphicsProgram {
 		}
 		pressX = e.getX();
 		pressY = e.getY();
-		computeScores();
+		bar.setFlags();
 	}
 
 	/*
@@ -276,82 +260,64 @@ public class Satisficer extends GraphicsProgram {
 				}
 			}
 		}
-		computeScores();
+		bar.setFlags();
 	}
 	
-	private void computeScores() {
-		bar.setSoftSatisfied(computeAdjacencyScore());
-		computeRoomCountScore();
-	}
 	
-	//TODO
-	double ADJACENCY_THRESHOLD = 20.0;
-	public double computeAdjacencyScore(){
-		if(rooms.isEmpty()) return 0.0;
-		double score = 0.0;
-		for(Room room: rooms){
-			score += room.getAdjacencyConstraint().evaluate(rooms, affinityMatrix);
-		}
-		return score/rooms.size();
+	
+	
+	
+//	//TODO
+//	double computeRoomSizeScore(){
+//		int countScore = 0;
+//		int maxScore = 7;
+//		for(Room room: rooms){
+//			//if(floorPlanContains(room))
+//			if(room.getSizeConstraint().satisfied()){
+//				countScore++;
+//			}
+//		}
+//		int totalSizeScore = (countScore*100)/maxScore;
+//		double hardHeight = totalSizeScore/2.0;
+//		return 0.0;
+//	}
+	
+//	private boolean floorPlanContains(Room room){
+//		return floor.getBounds().intersects(room.getBounds());
+//	}
 
-	}
+//	Utils included elsewhere	
 	
-	//TODO
-	double computeRoomSizeScore(){
-		int countScore = 0;
-		int maxScore = 7;
-		for(Room room: rooms){
-			if(room.getSizeConstraint().satisfied()){
-				countScore++;
-			}
-		}
-		int totalSizeScore = (countScore*100)/maxScore;
-		double hardHeight = totalSizeScore/2.0;
-		return 0.0;
-	}
+//	//TODO	
+//	private int affinity(Room a, Room b) {
+//		return affinityMatrix[a.getType().index()][b.getType().index()];
+//	}
+//
+//	/*
+//	 * Function: distance(GPoint a, GPoint b)
+//	 * ----------------------
+//	 * Distance between points.
+//	 */
+//	private double distance(GPoint a, GPoint b){
+//		return Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
+//	}
+//	
+//	/*
+//	 * Function: distance(Room a, Room b)
+//	 * ----------------------
+//	 * Distance between two rooms.
+//	 * Equal to length or shortest line between them.
+//	 */
+//	private double distance(Room a, Room b){
+//		double xDiff1 = Math.max(b.getX() - (a.getX() + a.getWidth()),0);
+//		double xDiff2 = Math.max(a.getX() - (b.getX() + b.getWidth()),0);
+//		double yDiff1 = Math.max(b.getY() - (a.getY() + a.getHeight()),0);
+//		double yDiff2 = Math.max(a.getY() - (b.getY() + b.getHeight()),0);
+//		return Math.sqrt(Math.pow(xDiff1,2) + Math.pow(xDiff2,2) + Math.pow(yDiff1,2) + Math.pow(yDiff2,2));
+//	}
 	
-	double computeRoomCountScore(){
-		int countScore = 0;
-		int maxScore = 14;
-		for(Button button: buttons){
-			countScore += button.getCountConstraint().evaluate(rooms);
-		}
-		int totalRoomScore = (countScore*100)/maxScore;
-		double hardHeight = totalRoomScore/2.0;
-		String labelscore = "Hard Score: " + totalRoomScore +"%";
-		
-		System.out.println(labelscore);
-		bar.setHardSatisfied(hardHeight);
-		return 0.0;
-	}
-
-	//TODO	
-	private int affinity(Room a, Room b) {
-		return affinityMatrix[a.getType().index()][b.getType().index()];
-	}
-
-	/*
-	 * Function: distance(GPoint a, GPoint b)
-	 * ----------------------
-	 * Distance between points.
-	 */
-	private double distance(GPoint a, GPoint b){
-		return Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
-	}
 	
-	/*
-	 * Function: distance(Room a, Room b)
-	 * ----------------------
-	 * Distance between two rooms.
-	 * Equal to length or shortest line between them.
-	 */
-	private double distance(Room a, Room b){
-		double xDiff1 = Math.max(b.getX() - (a.getX() + a.getWidth()),0);
-		double xDiff2 = Math.max(a.getX() - (b.getX() + b.getWidth()),0);
-		double yDiff1 = Math.max(b.getY() - (a.getY() + a.getHeight()),0);
-		double yDiff2 = Math.max(a.getY() - (b.getY() + b.getHeight()),0);
-		return Math.sqrt(Math.pow(xDiff1,2) + Math.pow(xDiff2,2) + Math.pow(yDiff1,2) + Math.pow(yDiff2,2));
-	}
+	
 }
 
 //////////OLD JUNK: Flavia
@@ -487,3 +453,12 @@ add(b2);*/
 //    add(room);
 //    rooms.add(room);
 //}
+
+//Example photo reading
+//BufferedImage img = null;
+//try {
+//	    img = ImageIO.read(new File("Captured.PNG"));
+//} catch (IOException e) {
+//}
+//GImage im = new GImage(img);
+//add(im);	

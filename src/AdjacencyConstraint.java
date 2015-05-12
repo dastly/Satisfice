@@ -9,6 +9,7 @@ public class AdjacencyConstraint extends Constraint {
 		super(room);
 	}
 	
+	//Evaluates to a number between 0.0 and 1.0
 	public double evaluate(Vector<Room> rooms, int[][] affinityMatrix){
 		Room cRoom = getRoom();
 		int adjacencies = 0;
