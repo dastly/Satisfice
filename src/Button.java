@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.Vector;
 
 import acm.graphics.*;
 
@@ -12,10 +13,27 @@ public class Button extends GCompound {
 		shape.setFilled(true);
 		add(shape);
 		add(new GLabel("ADD " + type.label(), 5, 15), 5, 15);
+		constraints = new Vector<Constraint>();
+		cc = new CountConstraint(type);
+		constraints.add(cc);
 	}
 	
-	public
+	public RoomType getType(){
+		return type;
+	}
+	
+	public Vector<Constraint> getConstraints(){
+		return constraints;
+	}
+	
+	public CountConstraint getCountConstraint(){
+		return cc;
+	}
+	
+	private
 		RoomType type;
+		Vector<Constraint> constraints;
+		CountConstraint cc;
 	
 }
 

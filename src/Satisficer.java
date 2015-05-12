@@ -34,7 +34,7 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_HEIGHT = 50;
 	int BUTTON_SPACING = 10;
 	int ROOM_OFFSET_BOTTOM = 10;
-	double PXL_TO_FT = 25.0/400.0; //Also in Room.java
+	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java
 	int affinityMatrix[][] = {
 		      { 0, -2, -2,  1, -2, -2, -1},
 		      {-2,  0, -1,  1,  2,  2,  0},
@@ -47,9 +47,9 @@ public class Satisficer extends GraphicsProgram {
 	
 	//Globals
 	Vector<Room> rooms = new Vector<Room>();
+	Vector<Button> buttons = new Vector<Button>();
 	Floorplan floor = null;
 	ConstraintBar bar = null;
-	GLabel score = null;
 	Vector<Constraint> affinityConstraints = new Vector<Constraint>();
 	
 	
@@ -85,16 +85,12 @@ public class Satisficer extends GraphicsProgram {
 		//Adds button for adding every type of room
 	    int i = 0;
 	    for(RoomType type: RoomType.values()){
-		   Button b1 = new Button(BUTTON_WIDTH, BUTTON_HEIGHT, type);
-		    b1.setLocation(BUTTON_SPACING + i, WINDOW_HEIGHT - BUTTON_HEIGHT - BUTTON_OFFSET_BOTTOM);
-		    add(b1);
-		    i += BUTTON_WIDTH + BUTTON_SPACING;
+		   Button button = new Button(BUTTON_WIDTH, BUTTON_HEIGHT, type);
+		   button.setLocation(BUTTON_SPACING + i, WINDOW_HEIGHT - BUTTON_HEIGHT - BUTTON_OFFSET_BOTTOM);
+		   add(button);
+		   i += BUTTON_WIDTH + BUTTON_SPACING;
+		   buttons.add(button);
 	    }
-	    
-	    score = new GLabel("Score: ", 20, 10);
-	    add(score);
-		
-		//printScore();
 		addMouseListeners();
 		
 		
@@ -146,7 +142,7 @@ public class Satisficer extends GraphicsProgram {
 	 */
 	
 	public void pressButton(Button button){
-		RoomType type = button.type;
+		RoomType type = button.getType();
 		Room room = new Room(type.width(), type.height(), type);
 		room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 		add(room);
@@ -187,7 +183,7 @@ public class Satisficer extends GraphicsProgram {
 				resizing = true;
 			} else if (selectedInnerObject instanceof RotateDiamond){
 				rotating = true;
-			} else if (selectedInnerObject instanceof GRect) {
+			} else if (!(selectedInnerObject instanceof RemoveCircle)) {
 				moving = true;
 			}// else if (selectedInnerObject instanceof RemoveCircle) return;
 			if(!selectedRooms.contains(room)){
@@ -285,101 +281,40 @@ public class Satisficer extends GraphicsProgram {
 	
 	private void computeScores() {
 		bar.setSoftSatisfied(computeAdjacencyScore());
-//		bar.setHardSatisfied(TODO);
+		computeRoomCountScore();
 	}
 	
 	//TODO
 	double ADJACENCY_THRESHOLD = 20.0;
 	public double computeAdjacencyScore(){
-		int adjacencies = 0;
-		int adjacencyScore = 0;
-		for(int i = 0; i < rooms.size(); i++){
-			for(int j = i+1; j < rooms.size(); j++){
-				if(distance(rooms.elementAt(i),rooms.elementAt(j)) <= ADJACENCY_THRESHOLD){
-					adjacencies++;
-					adjacencyScore += affinity(rooms.elementAt(i), rooms.elementAt(j));
-				}
-			}
+		if(rooms.isEmpty()) return 0.0;
+		double score = 0.0;
+		for(Room room: rooms){
+			score += room.getAdjacencyConstraint().evaluate(rooms, affinityMatrix);
 		}
-		System.out.println(adjacencies);
-		if(adjacencies == 0) return 0.5;
-		System.out.println("Score: " + ((double)adjacencyScore/(double)adjacencies + 2)/4.0);
-		return ((double)adjacencyScore/(double)adjacencies + 2)/4.0;
+		return score/rooms.size();
+
 	}
 	
 	//TODO
 	double computeRoomSizeScore(){
+		int countScore = 0;
+		int maxScore = 7;
 		for(Room room: rooms){
-			if(room.getSqFootage() < PXL_TO_FT * room.getType().width()*room.getType().height()){
-				
+			if(room.getSizeConstraint().satisfied()){
+				countScore++;
 			}
 		}
+		int totalSizeScore = (countScore*100)/maxScore;
+		double hardHeight = totalSizeScore/2.0;
 		return 0.0;
 	}
 	
-	//TODO
 	double computeRoomCountScore(){
-		int totFaculty = 0;
-		int totMeeting = 0;
-		int totAuditorium = 0;
-		int totCafeteria = 0;
-		int totSmallC = 0;
-		int totLargeC = 0;
-		int totMEP = 0;
-		int countScore =0;
-		int maxScore =14;
-		for (Room room: rooms){
-			if (room.getType()==RoomType.FACULTY){
-				totFaculty++;
-			} else if (room.getType()==RoomType.MEETING){
-				totMeeting++;
-			} else if (room.getType()==RoomType.AUDITORIUM){
-				totAuditorium++;
-			} else if (room.getType()==RoomType.CAFETERIA){
-				totCafeteria++;
-			} else if (room.getType()==RoomType.SMALLCLASSROOM){
-				totSmallC++;
-			} else if (room.getType()==RoomType.LARGECLASSROOM){
-				totLargeC++;
-			} else if (room.getType()==RoomType.MEP){
-				totMEP++;
-			}
-		}
-		// Adding Faculty points
-		if (totFaculty>0&&totFaculty<5){
-			countScore++;
-		} else if (totFaculty>=5){
-			countScore=countScore+2;
-		}
-		//Adding Meeting points
-		if (totMeeting>0&&totMeeting<5){
-			countScore++;
-		} else if (totMeeting>=5){
-			countScore=countScore+2;
-		}
-		//Adding Auditorium points
-		if (totAuditorium==1){
-			countScore=countScore+2;
-		}
-		//Adding Cafeteria points
-		if (totCafeteria==1){
-			countScore=countScore+2;
-		}
-		// Adding Small Classroom points
-		if (totSmallC>0&&totSmallC<5){
-			countScore++;
-		} else if (totSmallC>=5){
-			countScore=countScore+2;
-		}
-		// Adding Large Classroom points
-		if (totLargeC>0&&totLargeC<2){
-			countScore++;
-		} else if (totLargeC>=2){
-			countScore=countScore+2;
-		}
-		//Adding MEP points
-		if (totMEP==1){
-			countScore=countScore+2;
+		int countScore = 0;
+		int maxScore = 14;
+		for(Button button: buttons){
+			countScore += button.getCountConstraint().evaluate(rooms);
 		}
 		int totalRoomScore = (countScore*100)/maxScore;
 		double hardHeight = totalRoomScore/2.0;
@@ -390,7 +325,6 @@ public class Satisficer extends GraphicsProgram {
 		return 0.0;
 	}
 
-	
 	//TODO	
 	private int affinity(Room a, Room b) {
 		return affinityMatrix[a.getType().index()][b.getType().index()];
@@ -420,7 +354,96 @@ public class Satisficer extends GraphicsProgram {
 	}
 }
 
-//////////OLD JUNK
+//////////OLD JUNK: Flavia
+
+
+//int totFaculty = 0;
+//int totMeeting = 0;
+//int totAuditorium = 0;
+//int totCafeteria = 0;
+//int totSmallC = 0;
+//int totLargeC = 0;
+//int totMEP = 0;
+//int countScore =0;
+//int maxScore =14;
+//for (Room room: rooms){
+//	if (room.getType()==RoomType.FACULTY){
+//		totFaculty++;
+//	} else if (room.getType()==RoomType.MEETING){
+//		totMeeting++;
+//	} else if (room.getType()==RoomType.AUDITORIUM){
+//		totAuditorium++;
+//	} else if (room.getType()==RoomType.CAFETERIA){
+//		totCafeteria++;
+//	} else if (room.getType()==RoomType.SMALLCLASSROOM){
+//		totSmallC++;
+//	} else if (room.getType()==RoomType.LARGECLASSROOM){
+//		totLargeC++;
+//	} else if (room.getType()==RoomType.MEP){
+//		totMEP++;
+//	}
+//}
+//// Adding Faculty points
+//if (totFaculty>0&&totFaculty<5){
+//	countScore++;
+//} else if (totFaculty>=5){
+//	countScore=countScore+2;
+//}
+////Adding Meeting points
+//if (totMeeting>0&&totMeeting<5){
+//	countScore++;
+//} else if (totMeeting>=5){
+//	countScore=countScore+2;
+//}
+////Adding Auditorium points
+//if (totAuditorium==1){
+//	countScore=countScore+2;
+//}
+////Adding Cafeteria points
+//if (totCafeteria==1){
+//	countScore=countScore+2;
+//}
+//// Adding Small Classroom points
+//if (totSmallC>0&&totSmallC<5){
+//	countScore++;
+//} else if (totSmallC>=5){
+//	countScore=countScore+2;
+//}
+//// Adding Large Classroom points
+//if (totLargeC>0&&totLargeC<2){
+//	countScore++;
+//} else if (totLargeC>=2){
+//	countScore=countScore+2;
+//}
+////Adding MEP points
+//if (totMEP==1){
+//	countScore=countScore+2;
+//}
+//int totalRoomScore = (countScore*100)/maxScore;
+//double hardHeight = totalRoomScore/2.0;
+//String labelscore = "Hard Score: " + totalRoomScore +"%";
+//
+//System.out.println(labelscore);
+//bar.setHardSatisfied(hardHeight);
+//return 0.0;
+
+//////////OLD JUNK: Dustin
+
+
+//int adjacencies = 0;
+//int adjacencyScore = 0;
+//for(int i = 0; i < rooms.size(); i++){
+//	for(int j = i+1; j < rooms.size(); j++){
+//		if(distance(rooms.elementAt(i),rooms.elementAt(j)) <= ADJACENCY_THRESHOLD){
+//			adjacencies++;
+//			adjacencyScore += affinity(rooms.elementAt(i), rooms.elementAt(j));
+//		}
+//	}
+//}
+//System.out.println(adjacencies);
+//if(adjacencies == 0) return 0.5;
+//System.out.println("Score: " + ((double)adjacencyScore/(double)adjacencies + 2)/4.0);
+//return ((double)adjacencyScore/(double)adjacencies + 2)/4.0;
 
 /*
 	// Dustin: Just testing a sample constraint

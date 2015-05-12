@@ -9,6 +9,7 @@
  */
 
 import java.awt.Color;
+import java.util.Vector;
 
 import acm.graphics.*;
 
@@ -63,8 +64,18 @@ public class Room extends GCompound {
 		size = new GLabel(getSqFootage() + "ft.^2", 5, 25);
 		add(size);
 		
+		addRoomConstraints();
+		
 	}
 	
+	private void addRoomConstraints() {
+		constraints = new Vector<Constraint>();
+		ac = new AdjacencyConstraint(this);
+		sc = new SizeConstraint(this);
+		constraints.add(ac);
+		constraints.add(sc);
+	}
+
 	@Override
 	public double getWidth(){
 		return room.getWidth();
@@ -111,12 +122,35 @@ public class Room extends GCompound {
 		return type;
 	}
 	
+	public Vector<Constraint> getConstraints(){
+		return constraints;
+	}
+	
+	public void addConstraint(Constraint constraint){
+		constraints.add(constraint);
+	}
+	
+	public void removeConstraint(Constraint constraint){
+		constraints.remove(constraint);
+	}
+	
+	public AdjacencyConstraint getAdjacencyConstraint(){
+		return ac;
+	}
+	
+	public SizeConstraint getSizeConstraint(){
+		return sc;
+	}
+	
 	private
 		RoomType type;
 		GRect room;
 		ResizeBlock lowerRight;
 		RemoveCircle upperRight;
 		GLabel size;
+		Vector<Constraint> constraints;
+		AdjacencyConstraint ac;
+		SizeConstraint sc;
 		
 		//GPolygon room; //if using rotate
 		//RotateDiamond lowerLeft;

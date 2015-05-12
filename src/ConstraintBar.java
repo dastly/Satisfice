@@ -44,6 +44,7 @@ public class ConstraintBar extends GCompound {
 		add(bar);
 		add(soft);
 		add(hard);
+		paint(bar);
 	}
 	public void paint(GRect cBar) {
 	  Color color1 = Color.GREEN;
@@ -66,7 +67,8 @@ public class ConstraintBar extends GCompound {
 
 	public void setSoftSatisfied(double satisfied) {
 		softSatisfied = satisfied;
-		soft.setLocation(-50, BAR_HEIGHT - getSoftSatisfaction());
+		soft.setLocation(-75, BAR_HEIGHT - getSoftSatisfaction());
+		soft.setLabel("SOFT: " + satisfied);
 	}
 	
 	public void setHardSatisfied(double satisfied) {
