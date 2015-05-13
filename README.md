@@ -6,3 +6,5 @@ Buttons now represent RoomType clusters as well.
 
 Each flag is associated with a list or rooms and buttons.
 Each flag computes its own score for the constraint bar based off of the assoicated constraints.
+
+Requires Stanford version of Eclipse (Helios)
