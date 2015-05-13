@@ -47,8 +47,6 @@ public class Room extends GCompound {
 		add(lowerRight);
 		
 		upperRight = new RemoveCircle(10,10);
-		upperRight.setFillColor(Color.RED);
-		upperRight.setFilled(true);
 		add(upperRight);
 		
 		/*GPoint[] dvertices = {new GPoint(0,5), new GPoint(5,0), new GPoint(0,-5), new GPoint(-5,0)};
