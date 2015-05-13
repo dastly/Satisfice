@@ -11,6 +11,7 @@ import acm.program.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -81,6 +82,7 @@ public class Satisficer extends GraphicsProgram {
 		bar.setFlags();
 		
 		addMouseListeners();
+		addKeyListeners();
 		
 	}
 	
@@ -96,6 +98,27 @@ public class Satisficer extends GraphicsProgram {
 	boolean resizing = false;
 	boolean rotating = false;
 	boolean selecting = false;
+	
+	boolean shift = false;
+	
+	/* 
+	 * EventHandler: keyPressed(KeyEvent e)
+	 * 
+	 */
+	
+	public void keyPressed(KeyEvent e) {
+		int code = e.getKeyCode();
+		if (code == KeyEvent.VK_SHIFT) {
+			shift = true;
+		}
+	}
+	
+	public void keyReleased(KeyEvent e) {
+		int code = e.getKeyCode();
+		if (code == KeyEvent.VK_SHIFT) {
+			shift = false;
+		}
+	}
 	
 	/*
 	 * EventHandler: mouseClicked(...)
@@ -170,7 +193,18 @@ public class Satisficer extends GraphicsProgram {
 			} else if (!(selectedInnerObject instanceof RemoveCircle)) {
 				moving = true;
 			}// else if (selectedInnerObject instanceof RemoveCircle) return;
-			if(!selectedRooms.contains(room)){
+			if (shift) { // if we're pressing shift while clicking
+				if (selectedRooms.contains(room)) {
+					// if we're clicking a selected room, we unselect it
+					selectedRooms.remove(room);
+					room.unhighlight();
+				} else {
+					// if we're clicking an unselected room, we select it
+					selectedRooms.addElement(room);
+					room.highlight();
+				}
+			}
+			else if (!selectedRooms.contains(room)){
 				for(Room sroom: selectedRooms){
 					sroom.unhighlight();
 				}
