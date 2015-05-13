@@ -83,7 +83,6 @@ public class Satisficer extends GraphicsProgram {
 		
 		addMouseListeners();
 		addKeyListeners();
-		
 	}
 	
 	//Globals shared between Mouse events
@@ -103,7 +102,8 @@ public class Satisficer extends GraphicsProgram {
 	
 	/* 
 	 * EventHandler: keyPressed(KeyEvent e)
-	 * 
+	 * -----------------------
+	 * Sets the variable shift to true if the user is pressing the shift key.
 	 */
 	
 	public void keyPressed(KeyEvent e) {
@@ -170,6 +170,7 @@ public class Satisficer extends GraphicsProgram {
 	 * Outside 		-> selecting
 	 * 
 	 * Button actions and RemoveCircle action handled by clicks only.
+	 * Also allows multiselect/unselect if the shift key is pressed.
 	 */
 	public void mousePressed(MouseEvent e){
 		

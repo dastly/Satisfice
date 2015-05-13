@@ -9,13 +9,15 @@ import java.awt.Color;
 
 import acm.graphics.GCompound;
 import acm.graphics.GLine;
-import acm.graphics.GOval;
+import acm.graphics.GRect;
+
+import java.awt.event.*;
 
 
 public class RemoveCircle extends GCompound {
 
-	public RemoveCircle(double arg0, double arg1) {
-		upperRight = new GOval(arg0, arg1);
+	public RemoveCircle(double width, double height) {
+		upperRight = new GRect(width, height);
 		upperRight.setFillColor(Color.RED);
 		upperRight.setFilled(true);
 		add(upperRight);
@@ -29,7 +31,7 @@ public class RemoveCircle extends GCompound {
 	}
 	
 	private
-		GOval upperRight;
+		GRect upperRight;
 		GLine xLine1;
 		GLine xLine2;
 }
