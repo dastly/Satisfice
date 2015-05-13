@@ -20,6 +20,18 @@ public class Constraint {
 		return type;
 	}
 	
+	public String getConstraintType() {
+		if (this instanceof AdjacencyConstraint) {
+			return "Adjacency";
+		} else if (this instanceof SizeConstraint) {
+			return "Size";
+		} else if (this instanceof CountConstraint) {
+			return "Count";
+		} else {
+			return "Misc";
+		}
+	}
+	
 	private
 		Room room;
 		RoomType type;

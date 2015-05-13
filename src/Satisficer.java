@@ -30,6 +30,8 @@ public class Satisficer extends GraphicsProgram {
 	int WINDOW_HEIGHT = 700;
 	int BAR_X = 100;
 	int BAR_Y = 60;
+	int VIS_X = WINDOW_WIDTH - 500;
+	int VIS_Y = 60;
 	int BUTTON_OFFSET_BOTTOM = 25;
 	int BUTTON_WIDTH = 100;
 	int BUTTON_HEIGHT = 50;
@@ -42,6 +44,7 @@ public class Satisficer extends GraphicsProgram {
 	Vector<Button> buttons = new Vector<Button>();
 	Floorplan floor = null;
 	ConstraintBar bar = null;
+	Visualiser visualiser = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -81,6 +84,10 @@ public class Satisficer extends GraphicsProgram {
 		bar.setLocation(BAR_X, BAR_Y);
 		bar.setFlags();
 		
+		visualiser = new Visualiser(getConstraints(), rooms);
+		add(visualiser);
+		visualiser.setLocation(VIS_X, VIS_Y);
+		
 		addMouseListeners();
 		addKeyListeners();
 	}
@@ -99,6 +106,15 @@ public class Satisficer extends GraphicsProgram {
 	boolean selecting = false;
 	
 	boolean shift = false;
+	
+
+	private Vector<Constraint> getConstraints() {
+		Vector<Constraint> constraints = new Vector<Constraint>();
+		for (Room room: selectedRooms) {
+			constraints.addAll(room.getConstraints());
+		}
+		return constraints;
+	}
 	
 	/* 
 	 * EventHandler: keyPressed(KeyEvent e)
@@ -141,6 +157,7 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		bar.setFlags();
+		visualiser.update(getConstraints(), rooms);
 	}
 	
 	/*
@@ -156,6 +173,7 @@ public class Satisficer extends GraphicsProgram {
 		add(room);
 		rooms.add(room);
 		bar.setFlags();
+		visualiser.update(getConstraints(), rooms);
 	}
 	
 	/*
@@ -257,6 +275,7 @@ public class Satisficer extends GraphicsProgram {
 		pressX = e.getX();
 		pressY = e.getY();
 		bar.setFlags();
+		visualiser.update(getConstraints(), rooms);
 	}
 
 	/*
@@ -296,6 +315,7 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		bar.setFlags();
+		visualiser.update(getConstraints(), rooms);
 	}
 	
 	
