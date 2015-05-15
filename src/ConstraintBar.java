@@ -31,7 +31,8 @@ public class ConstraintBar extends GCompound {
 	double softSatisfied = 0;
 	double hardSatisfied = 0;
 	
-	public ConstraintBar(Vector<Flag> flags) {
+	public ConstraintBar(Vector<Flag> flags, Vector<Room> allRooms) {
+		this.allRooms = allRooms;
 		bar = new GRect(BAR_WIDTH, BAR_HEIGHT);
 		bar.setFillColor(Color.BLUE);
 		add(bar);
@@ -65,27 +66,25 @@ public class ConstraintBar extends GCompound {
 	
 	public void setFlags(){
 		for(Flag flag: flags){
-			if(flag instanceof SoftFlag){
-				setSoftFlag((SoftFlag) flag);
-			}
-			if(flag instanceof HardFlag){
-				setHardFlag((HardFlag) flag);
-			}
+			double satisfaction = flag.satisfaction(allRooms);
+			flag.setLabel(Math.floor(satisfaction * 100) / 100);
+			double x = (flag.onLeft()) ? - FLAG_OFFSET - flag.getWidth() : BAR_WIDTH + FLAG_OFFSET;
+			flag.setLocation(x, BAR_HEIGHT * (1 - satisfaction));
 		}
 		adjustOverlaps();
 	}
 	
-	private void setSoftFlag(SoftFlag flag) {
-		double satisfaction = flag.satisfaction();
-		flag.setLabel(Math.floor(satisfaction * 100) / 100);
-		flag.setLocation(-FLAG_OFFSET - flag.getWidth(), BAR_HEIGHT*(1 - satisfaction));
-	}
-	
-	private void setHardFlag(HardFlag flag) {
-		double satisfaction = flag.satisfaction();
-		flag.setLabel(Math.floor(satisfaction * 100) / 100);
-		flag.setLocation(BAR_WIDTH + FLAG_OFFSET, BAR_HEIGHT*(1 - satisfaction));
-	}
+//	private void setSoftFlag(SoftFlag flag) {
+//		double satisfaction = flag.satisfaction(allRooms);
+//		flag.setLabel(Math.floor(satisfaction * 100) / 100);
+//		flag.setLocation(-FLAG_OFFSET - flag.getWidth(), BAR_HEIGHT*(1 - satisfaction));
+//	}
+//	
+//	private void setHardFlag(HardFlag flag) {
+//		double satisfaction = flag.satisfaction();
+//		flag.setLabel(Math.floor(satisfaction * 100) / 100);
+//		flag.setLocation(BAR_WIDTH + FLAG_OFFSET, BAR_HEIGHT*(1 - satisfaction));
+//	}
 	
 	private void adjustOverlaps(){
 		for(Flag flag1: flags){
@@ -102,6 +101,9 @@ public class ConstraintBar extends GCompound {
 			}
 		}
 	}
+	
+	private
+		Vector<Room> allRooms;
 	
 	
 	

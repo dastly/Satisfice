@@ -88,16 +88,18 @@ public class Satisficer extends GraphicsProgram {
 	    }
 	    
 		Vector<Flag> flags = new Vector<Flag>();
-		Flag soft = new SoftFlag("SOFT", buttons, rooms);
-		Flag hard = new HardFlag("HARD", buttons, rooms);
-		Flag selectedSoft = new SoftFlag("SelSoft", buttons, selectedRooms);
-		Flag selectedHard = new HardFlag("SelHard", buttons, selectedRooms);
-		flags.add(soft);
-		flags.add(hard);
-		flags.add(selectedSoft);
-		flags.add(selectedHard);
+		Flag adj = new Flag("ADJ", buttons, rooms, FlagType.ADJACENCY, true);
+		Flag size = new Flag("SIZE", buttons, rooms, FlagType.SIZE, true);
+		Flag count = new Flag("COUNT", buttons, rooms, FlagType.COUNT, true);
+		Flag selectedadj = new Flag("SelAdj", buttons, selectedRooms, FlagType.ADJACENCY, false);
+		Flag selectedsize = new Flag("SelSize", buttons, selectedRooms, FlagType.SIZE, false);
+		flags.add(adj);
+		flags.add(size);
+		flags.add(count);
+		flags.add(selectedadj);
+		flags.add(selectedsize);
 		
-		bar = new ConstraintBar(flags); // ConstraintBar takes in #total soft constraints, #total hard constraints
+		bar = new ConstraintBar(flags, rooms); // ConstraintBar takes in #total soft constraints, #total hard constraints
 		add(bar);
 		bar.setLocation(BAR_X, BAR_Y);
 		bar.setFlags();
@@ -178,6 +180,7 @@ public class Satisficer extends GraphicsProgram {
 					rooms.remove(sroom);
 					remove(sroom);
 				}
+				selectedRooms.clear();
 			}
 		}
 		bar.setFlags();

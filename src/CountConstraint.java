@@ -16,10 +16,10 @@ public class CountConstraint extends Constraint {
 			}
 		}
 		if(type.strict() > 0) {
-			return (type.strict() == count) ? 2.0 : 0.0;
+			return (type.strict() == count) ? 1.0 : 0.0;
 		}
-		if(count >= type.min() && count < type.best()) return 1.0;
-		if(count >= type.best()) return 2.0;
+		if(count >= type.min() && count < type.best()) return (count - type.min() + 1) * 1.0/(type.best() - type.min() + 1.0);
+		if(count >= type.best()) return 1.0;
 		return 0.0;
 	}
 

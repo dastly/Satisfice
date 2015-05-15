@@ -85,6 +85,8 @@ public class Room extends GCompound {
 	}
 	
 	public void setSize(double width, double height) {
+		//if(width < 0) width = 0;
+		//(height < 0) height = 0;
 		room.setSize(width, height);
 		placeControls();
 		size.setLabel(getSqFootage() + "ft.^2");

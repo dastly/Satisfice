@@ -3,15 +3,16 @@ import java.util.Vector;
 
 public class AdjacencyConstraint extends Constraint {
 	
-	double ADJACENCY_THRESHOLD = 20.0;
-	int affinityMatrix[][] = {
-		      { 0, -2, -2,  1, -2, -2, -1},
-		      {-2,  0, -1,  1,  2,  2,  0},
-		      {-2,  1,  0,  2,  2,  2,  0},
-		      { 1,  1,  2,  0,  2,  2,  0},
-		      {-2,  2,  2,  2,  0,  2,  0},
-		      {-2,  2,  2,  2,  2,  0,  0},
-		      {-1, -1,  0,  0,  0,  0,  0}
+	double DROP_OFF_FACTOR = 40.0; //2*CELL_WIDTH, or 10 ft.
+	double HIGH_AFFINITY = 6.0;
+	int affinityMatrix[][] = { //Also in visualizer
+		      { 1, -2, -2,  1, -2, -2, -1},
+		      {-2,  1, -1,  1,  2,  2,  0},
+		      {-2,  1,  1,  2,  2,  2,  0},
+		      { 1,  1,  2,  1,  2,  2,  0},
+		      {-2,  2,  2,  2,  1,  2,  0},
+		      {-2,  2,  2,  2,  2,  1,  0},
+		      {-1, -1,  0,  0,  0,  0,  1}
 	};
 	
 	public AdjacencyConstraint(Room room) {
@@ -22,17 +23,21 @@ public class AdjacencyConstraint extends Constraint {
 	public double evaluate(Vector<Room> rooms){
 		Room cRoom = getRoom();
 		int adjacencies = 0;
-		int adjacencyScore = 0;
+		double adjacencyScore = 0;
 		for(Room room: rooms){
 			if(!room.equals(cRoom)){
-				if(distance(room, cRoom) <= ADJACENCY_THRESHOLD){
-					adjacencies++;
-					adjacencyScore += affinity(room, cRoom);
-				}
+//				if(distance(room, cRoom) <= ADJACENCY_THRESHOLD){
+//					adjacencies++;
+//					adjacencyScore += affinity(room, cRoom);
+//				}
+				//adjacencies++;
+				adjacencyScore += affinity(room, cRoom) * 1.0/(1.0+Math.pow(distance(room, cRoom)/DROP_OFF_FACTOR,2));
 			}
 		}
-		if(adjacencies == 0) return 0.5;
-		return ((double)adjacencyScore/(double)adjacencies + 2)/4.0;
+		//if(adjacencies == 0) return 0.5;
+		if(adjacencyScore > HIGH_AFFINITY) adjacencyScore = HIGH_AFFINITY;
+		if(adjacencyScore < -HIGH_AFFINITY) adjacencyScore = - HIGH_AFFINITY;
+		return (adjacencyScore/HIGH_AFFINITY + 1)/2.0;
 	}
 	
 	public int[][] getAffinityMatrix() {
