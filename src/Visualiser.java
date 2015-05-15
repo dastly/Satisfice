@@ -21,15 +21,27 @@ public class Visualiser extends GCompound {
 		      {-1, -1,  0,  0,  0,  0,  0}
 	};
 	
+	String instructions[][] = {
+			{"Room Type", "Min Size", "#Rooms"},
+			{"FACULTY", "180", "5 or more"},
+			{"MEETING", "200", "5 or more"},
+			{"AUD", "2500", "1"},
+			{"CAFE", "700", "1"},
+			{"SmallC", "500", "5 or more"},
+			{"LargeC", "800", "2 or more"},
+			{"MEP", "750", "1"}
+	};
+	
 	String affinityLabels[] = {"FACULTY", "MEETING", "AUD", "CAFE", "SmallC", "LargeC", "MEP"};
 	
 	public Visualiser(Vector<Constraint> constraints, Vector<Room> rooms) {
-		if (!constraints.isEmpty()) update(constraints, rooms);
 		showAffinityMatrix();
+		if (!constraints.isEmpty()) update(constraints, rooms);
 	}
 	
 	public void update(Vector<Constraint> constraints, Vector<Room> rooms) {
 		updateHeaders();
+		showAffinityMatrix();
 		int count = 1;
 		for (Constraint constraint: constraints) {
 			GLabel label = new GLabel(constraint.getConstraintType());
@@ -59,7 +71,7 @@ public class Visualiser extends GCompound {
 			add(label2);
 			for (int j=0; j<affinityMatrix.length; j++) {
 				label = new GLabel(Integer.toString(affinityMatrix[i][j]));
-				label.setLocation(MATRIX_X*i, MATRIX_Y + (OFFSET_Y*(j+1)));
+				label.setLocation(MATRIX_X*j, MATRIX_Y + (OFFSET_Y*(i+1)));
 				add(label);
 			}
 		}
