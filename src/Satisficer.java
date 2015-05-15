@@ -84,7 +84,7 @@ public class Satisficer extends GraphicsProgram {
 		bar.setLocation(BAR_X, BAR_Y);
 		bar.setFlags();
 		
-		visualiser = new Visualiser(getConstraints(), rooms);
+		visualiser = new Visualiser(getSelectedConstraints(), rooms);
 		add(visualiser);
 		visualiser.setLocation(VIS_X, VIS_Y);
 		
@@ -108,10 +108,16 @@ public class Satisficer extends GraphicsProgram {
 	boolean shift = false;
 	
 
-	private Vector<Constraint> getConstraints() {
+	private Vector<Constraint> getSelectedConstraints() {
 		Vector<Constraint> constraints = new Vector<Constraint>();
-		for (Room room: selectedRooms) {
-			constraints.addAll(room.getConstraints());
+		if (selectedRooms.isEmpty()) {
+			for (Room room: rooms) {
+				constraints.addAll(room.getConstraints());
+			}
+		} else {
+			for (Room room: selectedRooms) {
+				constraints.addAll(room.getConstraints());
+			}
 		}
 		return constraints;
 	}
@@ -157,7 +163,7 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		bar.setFlags();
-		visualiser.update(getConstraints(), rooms);
+		visualiser.update(getSelectedConstraints(), rooms);
 	}
 	
 	/*
@@ -173,7 +179,7 @@ public class Satisficer extends GraphicsProgram {
 		add(room);
 		rooms.add(room);
 		bar.setFlags();
-		visualiser.update(getConstraints(), rooms);
+		visualiser.update(getSelectedConstraints(), rooms);
 	}
 	
 	/*
@@ -275,7 +281,7 @@ public class Satisficer extends GraphicsProgram {
 		pressX = e.getX();
 		pressY = e.getY();
 		bar.setFlags();
-		visualiser.update(getConstraints(), rooms);
+		visualiser.update(getSelectedConstraints(), rooms);
 	}
 
 	/*
@@ -315,7 +321,7 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		bar.setFlags();
-		visualiser.update(getConstraints(), rooms);
+		visualiser.update(getSelectedConstraints(), rooms);
 	}
 	
 	
