@@ -2,7 +2,6 @@ import java.util.Vector;
 
 
 public class SoftFlag extends Flag {
-
 	public SoftFlag(String name, Vector<Button> buttons, Vector<Room> rooms) {
 		super(name, buttons, rooms);
 	}

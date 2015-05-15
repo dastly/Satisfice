@@ -2,7 +2,7 @@ import java.util.Vector;
 
 
 public class AdjacencyConstraint extends Constraint {
-
+	
 	double ADJACENCY_THRESHOLD = 20.0;
 	int affinityMatrix[][] = {
 		      { 0, -2, -2,  1, -2, -2, -1},
@@ -33,6 +33,10 @@ public class AdjacencyConstraint extends Constraint {
 		}
 		if(adjacencies == 0) return 0.5;
 		return ((double)adjacencyScore/(double)adjacencies + 2)/4.0;
+	}
+	
+	public int[][] getAffinityMatrix() {
+		return affinityMatrix;
 	}
 	
 	private double distance(Room a, Room b){
