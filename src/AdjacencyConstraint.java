@@ -4,13 +4,22 @@ import java.util.Vector;
 public class AdjacencyConstraint extends Constraint {
 
 	double ADJACENCY_THRESHOLD = 20.0;
+	int affinityMatrix[][] = {
+		      { 0, -2, -2,  1, -2, -2, -1},
+		      {-2,  0, -1,  1,  2,  2,  0},
+		      {-2,  1,  0,  2,  2,  2,  0},
+		      { 1,  1,  2,  0,  2,  2,  0},
+		      {-2,  2,  2,  2,  0,  2,  0},
+		      {-2,  2,  2,  2,  2,  0,  0},
+		      {-1, -1,  0,  0,  0,  0,  0}
+	};
 	
 	public AdjacencyConstraint(Room room) {
 		super(room);
 	}
 	
 	//Evaluates to a number between 0.0 and 1.0
-	public double evaluate(Vector<Room> rooms, int[][] affinityMatrix){
+	public double evaluate(Vector<Room> rooms){
 		Room cRoom = getRoom();
 		int adjacencies = 0;
 		int adjacencyScore = 0;
@@ -18,7 +27,7 @@ public class AdjacencyConstraint extends Constraint {
 			if(!room.equals(cRoom)){
 				if(distance(room, cRoom) <= ADJACENCY_THRESHOLD){
 					adjacencies++;
-					adjacencyScore += affinity(room, cRoom, affinityMatrix);
+					adjacencyScore += affinity(room, cRoom);
 				}
 			}
 		}
@@ -34,7 +43,7 @@ public class AdjacencyConstraint extends Constraint {
 		return Math.sqrt(Math.pow(xDiff1,2) + Math.pow(xDiff2,2) + Math.pow(yDiff1,2) + Math.pow(yDiff2,2));
 	}
 	
-	private int affinity(Room a, Room b, int[][] affinityMatrix) {
+	private int affinity(Room a, Room b) {
 		return affinityMatrix[a.getType().index()][b.getType().index()];
 	}
 

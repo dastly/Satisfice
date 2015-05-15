@@ -260,7 +260,7 @@ public class Satisficer extends GraphicsProgram {
 		}
 		if(resizing) {
 			for(Room room: selectedRooms){
-				room.resize(deltaX, deltaY);
+				room.setSize(room.getWidth() + deltaX, room.getHeight() + deltaY);
 			}
 		}
 		// Not working very well (so I made RotateDiamond currently invisible)
@@ -305,12 +305,16 @@ public class Satisficer extends GraphicsProgram {
 					}
 				}
 				if(resizing){
-					GPoint pt = floor.snapToGrid(new GPoint(e.getX(),e.getY()));
-					double deltaX = pt.getX() - pressX;
-					double deltaY = pt.getY() - pressY;
 					for(Room room: selectedRooms){
-						room.resize(deltaX, deltaY);
+						GPoint pt = floor.snapToGrid(new GPoint(room.getX()+room.getWidth(), room.getY()+room.getHeight()));
+						room.setSize(pt.getX()-room.getX(), pt.getY()-room.getY());
 					}
+//					GPoint pt = floor.snapToGrid(new GPoint(e.getX(),e.getY()));
+//					double deltaX = pt.getX() - pressX;
+//					double deltaY = pt.getY() - pressY;
+//					for(Room room: selectedRooms){
+//						room.resize(deltaX, deltaY);
+//					}
 				}
 			}
 		}

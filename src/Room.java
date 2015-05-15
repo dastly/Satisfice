@@ -83,10 +83,9 @@ public class Room extends GCompound {
 	public double getHeight(){
 		return room.getHeight();
 	}
-
-	public void resize(double deltaX, double deltaY) {
-		room.setSize(room.getWidth() + deltaX, room.getHeight() + deltaY);
-		//room.scale((x-initialX)/room.getWidth(), (y-initialY)/room.getHeight()); //GPolygon resize
+	
+	public void setSize(double width, double height) {
+		room.setSize(width, height);
 		placeControls();
 		size.setLabel(getSqFootage() + "ft.^2");
 	}
@@ -149,6 +148,8 @@ public class Room extends GCompound {
 		Vector<Constraint> constraints;
 		AdjacencyConstraint ac;
 		SizeConstraint sc;
+
+		
 		
 		//GPolygon room; //if using rotate
 		//RotateDiamond lowerLeft;
