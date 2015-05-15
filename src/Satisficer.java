@@ -32,10 +32,16 @@ public class Satisficer extends GraphicsProgram {
 	int BAR_Y = 60;
 	int VIS_X = WINDOW_WIDTH - 500;
 	int VIS_Y = 60;
-	int BUTTON_OFFSET_BOTTOM = 25;
-	int BUTTON_WIDTH = 100;
-	int BUTTON_HEIGHT = 50;
-	int BUTTON_SPACING = 10;
+	int ADD = 0; // add button
+	int VIEW = 1; // view button
+	int LABEL_OFFSET_BOTTOM = 25;
+	int LABEL_WIDTH = 100;
+	int LABEL_HEIGHT = 50;
+	int LABEL_SPACING = 10;
+	int BUTTON_WIDTH = 46;
+	int BUTTON_HEIGHT = 30;
+	int BUTTON_SPACING = 9;
+	int BUTTON_OFFSET_BOTTOM = 35;
 	int ROOM_OFFSET_BOTTOM = 10;
 	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java
 	
@@ -60,13 +66,25 @@ public class Satisficer extends GraphicsProgram {
 		add(floor);
 
 		//Adds button for adding every type of room
-	    int i = 0;
-	    for(RoomType type: RoomType.values()){
-		   Button button = new Button(BUTTON_WIDTH, BUTTON_HEIGHT, type);
-		   button.setLocation(BUTTON_SPACING + i, WINDOW_HEIGHT - BUTTON_HEIGHT - BUTTON_OFFSET_BOTTOM);
-		   add(button);
-		   i += BUTTON_WIDTH + BUTTON_SPACING;
-		   buttons.add(button);
+	    int i = 0, j = 0;
+	    for(RoomType roomType: RoomType.values()){
+			GLabel label = new GLabel(roomType.label());
+			label.setLocation(LABEL_SPACING + i, WINDOW_HEIGHT - LABEL_HEIGHT - LABEL_OFFSET_BOTTOM);
+			add(label);
+			   
+			Button addButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT, roomType, ADD);
+			addButton.setLocation(BUTTON_SPACING + j, WINDOW_HEIGHT - BUTTON_HEIGHT - BUTTON_OFFSET_BOTTOM);
+			j += BUTTON_WIDTH + BUTTON_SPACING;
+			add(addButton);
+			   
+			Button viewButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT, roomType, VIEW);
+			viewButton.setLocation(BUTTON_SPACING + j, WINDOW_HEIGHT - BUTTON_HEIGHT - BUTTON_OFFSET_BOTTOM);
+			j += BUTTON_WIDTH + BUTTON_SPACING;
+			add(viewButton);
+			   
+			i += LABEL_WIDTH + LABEL_SPACING;
+			buttons.add(addButton);
+			buttons.add(viewButton);
 	    }
 	    
 		Vector<Flag> flags = new Vector<Flag>();
@@ -173,13 +191,18 @@ public class Satisficer extends GraphicsProgram {
 	 * Adds room to room list.
 	 */
 	public void pressButton(Button button){
-		RoomType type = button.getType();
-		Room room = new Room(type.width(), type.height(), type);
-		room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
-		add(room);
-		rooms.add(room);
-		bar.setFlags();
-		visualiser.update(getSelectedConstraints(), rooms);
+		RoomType roomType = button.getRoomType();
+		int buttonType = button.getButtonType();
+		if (buttonType == ADD) {
+			Room room = new Room(roomType.width(), roomType.height(), roomType);
+			room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
+			add(room);
+			rooms.add(room);
+			bar.setFlags();
+			visualiser.update(getSelectedConstraints(), rooms);
+		} else if (buttonType == VIEW) {
+			// TODO: view buttons
+		}
 	}
 	
 	/*

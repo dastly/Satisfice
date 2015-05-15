@@ -6,20 +6,32 @@ import acm.graphics.*;
 
 public class Button extends GCompound {
 
-	public Button(double arg0, double arg1, RoomType type) {
+	int ADD = 0;
+	int VIEW = 1;
+	
+	public Button(double arg0, double arg1, RoomType roomType, int buttonType) {
 		GRoundRect shape = new GRoundRect(arg0, arg1);
-		this.type = type;
-		shape.setFillColor(type.color());
+		this.roomType = roomType;
+		this.buttonType = buttonType;
+		shape.setFillColor(roomType.color());
 		shape.setFilled(true);
 		add(shape);
-		add(new GLabel("ADD " + type.label(), 5, 15), 5, 15);
+		if (buttonType == ADD) {
+			add(new GLabel("ADD"), 12, 20);
+		} else if (buttonType == VIEW) {
+			add(new GLabel("VIEW"), 9, 20);
+		}
 		constraints = new Vector<Constraint>();
-		cc = new CountConstraint(type);
+		cc = new CountConstraint(roomType);
 		constraints.add(cc);
 	}
 	
-	public RoomType getType(){
-		return type;
+	public RoomType getRoomType(){
+		return roomType;
+	}
+	
+	public int getButtonType() {
+		return buttonType;
 	}
 	
 	public Vector<Constraint> getConstraints(){
@@ -31,7 +43,8 @@ public class Button extends GCompound {
 	}
 	
 	private
-		RoomType type;
+		RoomType roomType;
+		int buttonType;
 		Vector<Constraint> constraints;
 		CountConstraint cc;
 	

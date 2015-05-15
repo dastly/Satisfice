@@ -36,7 +36,7 @@ public class Visualiser extends GCompound {
 	
 	public Visualiser(Vector<Constraint> constraints, Vector<Room> rooms) {
 		showAffinityMatrix();
-		if (!constraints.isEmpty()) update(constraints, rooms);
+		update(constraints, rooms);
 	}
 	
 	public void update(Vector<Constraint> constraints, Vector<Room> rooms) {
