@@ -1,5 +1,8 @@
 import acm.graphics.GCompound;
 import acm.graphics.GLabel;
+import acm.graphics.GRect;
+
+import java.awt.event.MouseEvent;
 
 import java.awt.Color;
 import java.util.Vector;
@@ -10,6 +13,11 @@ public class Visualiser extends GCompound {
 	int OFFSET_X = 120;
 	int MATRIX_Y = 400;
 	int MATRIX_X = 60;
+	
+	int TOP_OFFSET = 96;
+	int BOTTOM_OFFSET = 330;
+	
+	int UP = 0, DOWN = 1; // for scroll buttons
 	
 	int affinityMatrix[][] = { //also in Adjacency Constraint
 		      { 1, -2, -2,  1, -2, -2, -1},
@@ -34,27 +42,39 @@ public class Visualiser extends GCompound {
 	
 	String affinityLabels[] = {"FACULTY", "MEETING", "AUD", "CAFE", "SmallC", "LargeC", "MEP"};
 	
+	ConstraintsTable table = null;
+	
 	public Visualiser(Vector<Constraint> constraints, Vector<Room> rooms) {
 		showAffinityMatrix();
+		table = new ConstraintsTable(constraints, rooms);
+		add(table);
 		update(constraints, rooms);
 	}
 	
+	private void setupScrollbar() {
+		GRect top = new GRect(600, 100);
+		GRect bot = new GRect(600, 600);
+		
+		top.setFillColor(Color.WHITE);
+		top.setColor(Color.WHITE);
+		top.setFilled(true);
+		top.setLocation(0, -TOP_OFFSET);
+		add(top);
+		
+		bot.setFillColor(Color.WHITE);
+		bot.setColor(Color.WHITE);
+		bot.setFilled(true);
+		bot.setLocation(0, BOTTOM_OFFSET);
+		add(bot);
+	}
+	
 	public void update(Vector<Constraint> constraints, Vector<Room> rooms) {
+		removeAll();
+		add(table);
+		table.update(constraints, rooms);
+		setupScrollbar();
 		updateHeaders();
 		showAffinityMatrix();
-		int count = 1;
-		for (Constraint constraint: constraints) {
-			GLabel label = new GLabel(constraint.getConstraintType());
-			label.setLocation(0, OFFSET_Y*count);
-			add(label);
-			
-			GLabel label3 = new GLabel(constraint.getType().toString());
-			label3.setLocation(OFFSET_X*2, OFFSET_Y*count);
-			add(label3);
-			
-			updateSatisfaction(constraint, count, rooms);
-			count++;
-		}
 	}
 	
 	private void showAffinityMatrix() {
@@ -77,37 +97,7 @@ public class Visualiser extends GCompound {
 		}
 	}
 	
-	private void updateSatisfaction(Constraint constraint, int count, Vector<Room> rooms) {
-		GLabel label;
-		if (constraint instanceof AdjacencyConstraint) {
-			String satisfaction = Double.toString(((AdjacencyConstraint)constraint).evaluate(rooms));
-			label = new GLabel(satisfaction);
-			label.setLocation(OFFSET_X, OFFSET_Y*count);
-			add(label);
-		} else if (constraint instanceof SizeConstraint) {
-			if (((SizeConstraint) constraint).satisfied()) {
-				label = new GLabel("Complete");
-				label.setColor(Color.GREEN);
-			} else {
-				label = new GLabel("Incomplete");
-				label.setColor(Color.RED);
-			}
-			label.setLocation(OFFSET_X, OFFSET_Y*count);
-			add(label);
-		} else if (constraint instanceof CountConstraint) {
-			String satisfaction = Double.toString(((CountConstraint)constraint).evaluate(rooms));
-			label = new GLabel(satisfaction);
-			label.setLocation(OFFSET_X, OFFSET_Y*count);
-			add(label);
-		} else {
-			label = new GLabel("MFiller");
-			label.setLocation(OFFSET_X, OFFSET_Y*count);
-			add(label);
-		}
-	}
-	
 	private void updateHeaders() {
-		removeAll();
 		GLabel label = new GLabel("Constraint Type");
 		label.setLocation(0, 0);
 		add(label);
