@@ -43,6 +43,7 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_SPACING = 9;
 	int BUTTON_OFFSET_BOTTOM = 35;
 	int ROOM_OFFSET_BOTTOM = 10;
+	int DESCRIPTION_OFFSET_BOTTOM = 10;
 	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java
 	
 	//Globals
@@ -51,6 +52,7 @@ public class Satisficer extends GraphicsProgram {
 	Floorplan floor = null;
 	ConstraintBar bar = null;
 	Visualiser visualiser = null;
+	TaskDescription description = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -86,6 +88,10 @@ public class Satisficer extends GraphicsProgram {
 			buttons.add(addButton);
 			buttons.add(viewButton);
 	    }
+	    
+	    description = new TaskDescription();
+	    description.setLocation(BUTTON_SPACING, WINDOW_HEIGHT - DESCRIPTION_OFFSET_BOTTOM);
+	    add(description);
 	    
 		Vector<Flag> flags = new Vector<Flag>();
 		Flag adj = new Flag("ADJ", buttons, rooms, FlagType.ADJACENCY, true);
@@ -204,7 +210,7 @@ public class Satisficer extends GraphicsProgram {
 			bar.setFlags();
 			visualiser.update(getSelectedConstraints(), rooms);
 		} else if (buttonType == VIEW) {
-			// TODO: view buttons
+			description.update(roomType.index());
 		}
 	}
 	
