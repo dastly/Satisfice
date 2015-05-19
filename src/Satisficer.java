@@ -42,6 +42,7 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_HEIGHT = 30;
 	int BUTTON_SPACING = 9;
 	int BUTTON_OFFSET_BOTTOM = 35;
+	int BUTTON_OFFSET_LEFT = 300;
 	int ROOM_OFFSET_BOTTOM = 10;
 	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java
 	
@@ -62,11 +63,12 @@ public class Satisficer extends GraphicsProgram {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);	
 		
 		floor = new Floorplan();
-		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
+		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2 - 300, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
 
 		//Adds button for adding every type of room
-	    int i = 0, j = 0;
+	    int i = BUTTON_OFFSET_LEFT, j = BUTTON_OFFSET_LEFT;
+	    
 	    for(RoomType roomType: RoomType.values()){
 			GLabel label = new GLabel(roomType.label());
 			label.setLocation(LABEL_SPACING + i, WINDOW_HEIGHT - LABEL_HEIGHT - LABEL_OFFSET_BOTTOM);
