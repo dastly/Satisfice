@@ -44,7 +44,12 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_OFFSET_BOTTOM = 35;
 	int BUTTON_OFFSET_LEFT = 300;
 	int ROOM_OFFSET_BOTTOM = 10;
-	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java
+	int DESCRIPTION_OFFSET_BOTTOM = 10;
+	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java	
+	int UP = 0, DOWN = 1; // for scroll buttons
+	int SCROLL_RIGHT_OFFSET = 440;
+	int SCROLL_BOT_OFFSET = 280;
+	int SCROLL_Y = 27;
 	
 	//Globals
 	Vector<Room> rooms = new Vector<Room>();
@@ -52,6 +57,9 @@ public class Satisficer extends GraphicsProgram {
 	Floorplan floor = null;
 	ConstraintBar bar = null;
 	Visualiser visualiser = null;
+	TaskDescription description = null;
+	ScrollButton up = null;
+	ScrollButton down = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -89,6 +97,10 @@ public class Satisficer extends GraphicsProgram {
 			buttons.add(viewButton);
 	    }
 	    
+	    description = new TaskDescription();
+	    description.setLocation(BUTTON_SPACING, WINDOW_HEIGHT - DESCRIPTION_OFFSET_BOTTOM);
+	    add(description);
+	    
 		Vector<Flag> flags = new Vector<Flag>();
 		Flag adj = new Flag("ADJ", buttons, rooms, FlagType.ADJACENCY, true);
 		Flag size = new Flag("SIZE", buttons, rooms, FlagType.SIZE, true);
@@ -110,6 +122,13 @@ public class Satisficer extends GraphicsProgram {
 		add(visualiser);
 		visualiser.setLocation(VIS_X, VIS_Y);
 		
+		up = new ScrollButton(UP);
+		up.setLocation(VIS_X + SCROLL_RIGHT_OFFSET, VIS_Y);
+		add(up);
+		down = new ScrollButton(DOWN);
+		down.setLocation(VIS_X + SCROLL_RIGHT_OFFSET, VIS_Y + SCROLL_BOT_OFFSET);
+		add(down);
+		
 		addMouseListeners();
 		addKeyListeners();
 	}
@@ -126,7 +145,6 @@ public class Satisficer extends GraphicsProgram {
 	boolean resizing = false;
 	boolean rotating = false;
 	boolean selecting = false;
-	
 	boolean shift = false;
 	
 
@@ -206,7 +224,7 @@ public class Satisficer extends GraphicsProgram {
 			bar.setFlags();
 			visualiser.update(getSelectedConstraints(), rooms);
 		} else if (buttonType == VIEW) {
-			// TODO: view buttons
+			description.update(roomType.index());
 		}
 	}
 	
@@ -265,6 +283,12 @@ public class Satisficer extends GraphicsProgram {
 				selectedRooms.add(room);
 				room.highlight();
 			}
+		} else if (selected instanceof ScrollButton) {
+			if (((ScrollButton)selected).type() == UP) {
+				visualiser.table.shift(-SCROLL_Y);
+			} else if (((ScrollButton)selected).type() == DOWN) {
+				visualiser.table.shift(SCROLL_Y);
+			}
 		} else {
 			for(Room sroom: selectedRooms){
 				sroom.unhighlight();
@@ -321,7 +345,6 @@ public class Satisficer extends GraphicsProgram {
 	 */
 	public void mouseReleased(MouseEvent e){
 		//if(object != null) System.out.println(object.getX() - 10);
-		
 		if(selecting){
 			for(Room room: rooms){
 				if(groupSelector.getBounds().intersects(room.getBounds())){
