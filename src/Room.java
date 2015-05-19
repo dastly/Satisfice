@@ -29,7 +29,6 @@ public class Room extends GCompound {
 	
 	public void createRoom(double width, double height, RoomType type) {
 		
-		
 		room = new GRect(width, height);
 		
 		//Rotation requires polygons
@@ -99,7 +98,9 @@ public class Room extends GCompound {
 //	}
 	
 	public double getSqFootage(){
-		return (room.getWidth()*room.getHeight())*PXL_TO_FT;
+		int roundedDown = (int) Math.floor((room.getWidth()*room.getHeight())*PXL_TO_FT);
+		if(roundedDown % 10 == 9) roundedDown += 1;
+		return (double) roundedDown;
 	}
 	
 	public void highlight(){
@@ -150,8 +151,6 @@ public class Room extends GCompound {
 		Vector<Constraint> constraints;
 		AdjacencyConstraint ac;
 		SizeConstraint sc;
-
-		
 		
 		//GPolygon room; //if using rotate
 		//RotateDiamond lowerLeft;

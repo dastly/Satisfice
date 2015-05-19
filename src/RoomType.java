@@ -9,15 +9,18 @@
 import java.awt.Color;
 
 //Cell 20px = 5ft
+// CELL_WIDTH = 4.0 * Math.sqrt(10);
+
+
 
 public enum RoomType {
-	FACULTY ("FACULTY", Color.GREEN, 60, 40, 0, 0, 1, 5),
-	MEETING ("MEETING", Color.YELLOW, 80, 40, 1, 0, 1, 5),
-	AUDITORIUM ("AUD", Color.CYAN, 240, 200, 2, 1, 0, 0),
-	CAFETERIA ("CAFE", Color.GRAY, 160, 160, 3, 1, 0, 0),
-	SMALLCLASSROOM ("SmallC", Color.ORANGE, 200, 40, 4, 0, 1, 5),
-	LARGECLASSROOM ("LargeC", Color.MAGENTA, 160, 80, 5, 0, 1, 2),
-	MEP ("MEP", Color.DARK_GRAY, 160, 100, 6, 1, 0, 0);
+	FACULTY ("FACULTY", Color.GREEN, 20.0 * Math.sqrt(10), 12.0 * Math.sqrt(10), 0, 0, 1, 5), //150 sq.ft
+	MEETING ("MEETING", Color.YELLOW, 20.0 * Math.sqrt(10), 16.0 * Math.sqrt(10), 1, 0, 1, 5), //200 sq. ft
+	AUDITORIUM ("AUD", Color.CYAN, 80.0 * Math.sqrt(10), 60.0 * Math.sqrt(10), 2, 1, 0, 0), //3000
+	CAFETERIA ("CAFE", Color.GRAY, 64.0 * Math.sqrt(10), 40.0 * Math.sqrt(10), 3, 1, 0, 0), //1600
+	SMALLCLASSROOM ("SmallC", Color.ORANGE, 40.0 * Math.sqrt(10), 20.0 * Math.sqrt(10), 4, 0, 1, 5), //500
+	LARGECLASSROOM ("LargeC", Color.MAGENTA, 40.0 * Math.sqrt(10), 32.0 * Math.sqrt(10), 5, 0, 1, 2), //800
+	MEP ("MEP", Color.DARK_GRAY, 40.0 * Math.sqrt(10), 40.0 * Math.sqrt(10), 6, 1, 0, 0); //1000
 	
 	private final String label;
 	private final Color color;
