@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.util.Vector;
 
 import acm.graphics.*;
@@ -67,6 +68,15 @@ public class Flag extends GCompound {
 	
 	public boolean onLeft(){
 		return onLeft;
+	}
+	
+	public void setColor(Color color){
+		shape.setFillColor(color);
+		shape.setFilled(true);
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	private

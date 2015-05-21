@@ -34,6 +34,8 @@ public class Satisficer extends GraphicsProgram {
 	int VIS_Y = 60;
 	int ADD = 0; // add button
 	int VIEW = 1; // view button
+	int CURRENT = 0;
+	int HIGHEST = 1;
 	int LABEL_OFFSET_BOTTOM = 25;
 	int LABEL_WIDTH = 100;
 	int LABEL_HEIGHT = 50;
@@ -42,6 +44,7 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_HEIGHT = 30;
 	int BUTTON_SPACING = 9;
 	int BUTTON_OFFSET_BOTTOM = 35;
+	int BUTTON_OFFSET_LEFT = 300;
 	int ROOM_OFFSET_BOTTOM = 10;
 	int DESCRIPTION_OFFSET_BOTTOM = 10;
 	double PXL_TO_FT = 25.0/400.0; //Also in Room.java and SizeConstraint.java	
@@ -52,6 +55,7 @@ public class Satisficer extends GraphicsProgram {
 	
 	//Globals
 	Vector<Room> rooms = new Vector<Room>();
+	Vector<Room> highestRooms = new Vector<Room>();
 	Vector<Button> buttons = new Vector<Button>();
 	Floorplan floor = null;
 	ConstraintBar bar = null;
@@ -59,6 +63,7 @@ public class Satisficer extends GraphicsProgram {
 	TaskDescription description = null;
 	ScrollButton up = null;
 	ScrollButton down = null;
+	double highScore = 0;
 	
 	/*
 	 * (non-Javadoc)
@@ -70,11 +75,12 @@ public class Satisficer extends GraphicsProgram {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);	
 		
 		floor = new Floorplan();
-		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2, (WINDOW_HEIGHT-floor.getHeight())/2);
+		floor.setLocation((WINDOW_WIDTH-floor.getWidth())/2 - 300, (WINDOW_HEIGHT-floor.getHeight())/2);
 		add(floor);
 
 		//Adds button for adding every type of room
-	    int i = 0, j = 0;
+	    int i = BUTTON_OFFSET_LEFT, j = BUTTON_OFFSET_LEFT;
+	    
 	    for(RoomType roomType: RoomType.values()){
 			GLabel label = new GLabel(roomType.label());
 			label.setLocation(LABEL_SPACING + i, WINDOW_HEIGHT - LABEL_HEIGHT - LABEL_OFFSET_BOTTOM);
@@ -95,6 +101,14 @@ public class Satisficer extends GraphicsProgram {
 			buttons.add(viewButton);
 	    }
 	    
+	    StateButton button = new StateButton("HIGHEST", HIGHEST);
+	    button.setLocation(0, 20);
+	    add(button);
+	    
+	    StateButton button2 = new StateButton("CURRENT", CURRENT);
+	    button2.setLocation(100, 20);
+	    add(button2);
+	    
 	    description = new TaskDescription();
 	    description.setLocation(BUTTON_SPACING, WINDOW_HEIGHT - DESCRIPTION_OFFSET_BOTTOM);
 	    add(description);
@@ -111,7 +125,7 @@ public class Satisficer extends GraphicsProgram {
 		flags.add(selectedadj);
 		flags.add(selectedsize);
 		
-		bar = new ConstraintBar(flags, rooms); // ConstraintBar takes in #total soft constraints, #total hard constraints
+		bar = new ConstraintBar(flags, rooms);
 		add(bar);
 		bar.setLocation(BAR_X, BAR_Y);
 		bar.setFlags();
@@ -201,8 +215,14 @@ public class Satisficer extends GraphicsProgram {
 				selectedRooms.clear();
 			}
 		}
-		bar.setFlags();
-		visualiser.update(getSelectedConstraints(), rooms);
+		if (selected instanceof StateButton) {
+			if (((StateButton)selected).getType() == CURRENT) {
+				
+			} else if (((StateButton)selected).getType() == HIGHEST) {
+				
+			}
+		}
+		update();
 	}
 	
 	/*
@@ -219,8 +239,7 @@ public class Satisficer extends GraphicsProgram {
 			room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 			add(room);
 			rooms.add(room);
-			bar.setFlags();
-			visualiser.update(getSelectedConstraints(), rooms);
+			update();
 		} else if (buttonType == VIEW) {
 			description.update(roomType.index());
 		}
@@ -312,6 +331,7 @@ public class Satisficer extends GraphicsProgram {
 		if(moving) {
 			for(Room room: selectedRooms){
 				room.move(deltaX,deltaY);
+				room.saveLocation(room.getLocation());
 			}
 		}
 		if(resizing) {
@@ -330,8 +350,7 @@ public class Satisficer extends GraphicsProgram {
 		}
 		pressX = e.getX();
 		pressY = e.getY();
-		bar.setFlags();
-		visualiser.update(getSelectedConstraints(), rooms);
+		update();
 	}
 
 	/*
@@ -373,12 +392,17 @@ public class Satisficer extends GraphicsProgram {
 				}
 			}
 		}
-		bar.setFlags();
-		visualiser.update(getSelectedConstraints(), rooms);
+		update();
 	}
 	
-	
-	
+	public void update() {
+		bar.setFlags();
+		visualiser.update(getSelectedConstraints(), rooms);
+		if (bar.getScore() > highScore) {
+			highScore = bar.getScore();
+			highestRooms = (Vector<Room>) rooms.clone();
+		}
+	}
 	
 	
 //	//TODO
