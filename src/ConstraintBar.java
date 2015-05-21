@@ -29,8 +29,8 @@ public class ConstraintBar extends GCompound {
 	GRect bar = null;
 	Vector<Flag> flags = null;
 	
-	public ConstraintBar(Vector<Flag> flags, Vector<Room> allRooms) {
-		this.allRooms = allRooms;
+	public ConstraintBar(Vector<Flag> flags, Vector<Room> rooms) {
+		this.rooms = rooms;
 		bar = new GRect(BAR_WIDTH, BAR_HEIGHT);
 		bar.setFillColor(Color.BLUE);
 		add(bar);
@@ -63,7 +63,7 @@ public class ConstraintBar extends GCompound {
 	
 	public void setFlags(){
 		for(Flag flag: flags){
-			double satisfaction = flag.satisfaction(allRooms);
+			double satisfaction = flag.satisfaction(rooms);
 			
 			int red = (int) (color2.getRed() * (1 - satisfaction) + color1.getRed() * satisfaction);
 	        int green = (int) (color2.getGreen() * (1 - satisfaction) + color1.getGreen() * satisfaction);
@@ -87,7 +87,7 @@ public class ConstraintBar extends GCompound {
 		double satisfaction = 0;
 		for (Flag flag: flags) {
 			if (flag.getName() == "ADJ" || flag.getName() == "COUNT" || flag.getName() == "SIZE") {
-				satisfaction += flag.satisfaction(allRooms);
+				satisfaction += flag.satisfaction(rooms);
 			}
 		}
 		this.overallScore = satisfaction;
@@ -97,8 +97,8 @@ public class ConstraintBar extends GCompound {
 		for(Flag flag: flags){
 			while(overlapsFlag(flag) != null){
 				Flag otherFlag = overlapsFlag(flag);
-				double satisfaction = flag.satisfaction(allRooms);
-				double satisfactionOther = otherFlag.satisfaction(allRooms);
+				double satisfaction = flag.satisfaction(rooms);
+				double satisfactionOther = otherFlag.satisfaction(rooms);
 				if(satisfaction <= satisfactionOther){
 					flag.move(0, heightDiff(flag, otherFlag) + 1);
 				} else {
@@ -123,7 +123,7 @@ public class ConstraintBar extends GCompound {
 	}
 	
 	private
-		Vector<Room> allRooms;
+		Vector<Room> rooms;
 		double overallScore;
 	
 	

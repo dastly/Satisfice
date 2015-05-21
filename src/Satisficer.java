@@ -64,6 +64,8 @@ public class Satisficer extends GraphicsProgram {
 	ScrollButton up = null;
 	ScrollButton down = null;
 	double highScore = 0;
+	StateButton highest = null;
+	StateButton current = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -101,13 +103,13 @@ public class Satisficer extends GraphicsProgram {
 			buttons.add(viewButton);
 	    }
 	    
-	    StateButton button = new StateButton("HIGHEST", HIGHEST);
-	    button.setLocation(0, 20);
-	    add(button);
+	    highest = new StateButton("HIGHEST", HIGHEST, Color.GRAY);
+	    highest.setLocation(0, 20);
+	    add(highest);
 	    
-	    StateButton button2 = new StateButton("CURRENT", CURRENT);
-	    button2.setLocation(100, 20);
-	    add(button2);
+	    current = new StateButton("CURRENT", CURRENT, Color.GREEN);
+	    current.setLocation(100, 20);
+	    add(current);
 	    
 	    description = new TaskDescription();
 	    description.setLocation(BUTTON_SPACING, WINDOW_HEIGHT - DESCRIPTION_OFFSET_BOTTOM);
@@ -207,7 +209,13 @@ public class Satisficer extends GraphicsProgram {
 			Room room = (Room) selected;
 			GPoint pt = room.getLocalPoint(e.getX(),e.getY());
 			GObject selectedInnerObject = room.getElementAt(pt.getX(),pt.getY());
+
 			if (selectedInnerObject instanceof RemoveCircle){
+				if (highest.isOn()) {
+					rooms = (Vector<Room>) highestRooms.clone();
+					highest.setFillColor(Color.GRAY);
+					current.setFillColor(Color.GREEN);
+				}
 				for(Room sroom: selectedRooms){
 					rooms.remove(sroom);
 					remove(sroom);
@@ -217,14 +225,38 @@ public class Satisficer extends GraphicsProgram {
 		}
 		if (selected instanceof StateButton) {
 			if (((StateButton)selected).getType() == CURRENT) {
-				
+				showRooms(CURRENT);
+				highest.setFillColor(Color.GRAY);
+				current.setFillColor(Color.GREEN);
 			} else if (((StateButton)selected).getType() == HIGHEST) {
-				
+				showRooms(HIGHEST);
+				highest.setFillColor(Color.GREEN);
+				current.setFillColor(Color.GRAY);
 			}
 		}
 		update();
 	}
 	
+	private void showRooms(int state) {
+		if (state == CURRENT) {
+			for (Room room: highestRooms) {
+				remove(room);
+			}
+			for (Room room: rooms) {
+				add(room);
+			}
+			System.out.println(rooms);
+		} else if (state == HIGHEST) {
+			for (Room room: rooms) {
+				remove(room);
+			}
+			for (Room room: highestRooms) {
+				add(room);
+			}
+			System.out.println(highestRooms);
+		}
+	}
+
 	/*
 	 * Function: pressButton(Button button)
 	 * ----------------------
@@ -238,6 +270,11 @@ public class Satisficer extends GraphicsProgram {
 			Room room = new Room(roomType.width(), roomType.height(), roomType);
 			room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 			add(room);
+			if (highest.isOn()) {
+				rooms = (Vector<Room>) highestRooms.clone();
+				highest.setFillColor(Color.GRAY);
+				current.setFillColor(Color.GREEN);
+			}
 			rooms.add(room);
 			update();
 		} else if (buttonType == VIEW) {

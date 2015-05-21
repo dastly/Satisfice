@@ -9,10 +9,10 @@ public class StateButton extends GCompound {
 	int WIDTH = 80;
 	int HEIGHT = 20;
 	
-	public StateButton(String name, int buttonType) {
+	public StateButton(String name, int buttonType, Color color) {
 		this.buttonType = buttonType;
-		GRoundRect button = new GRoundRect(WIDTH, HEIGHT);
-		button.setFillColor(Color.GREEN);
+		this.button = new GRoundRect(WIDTH, HEIGHT);
+		button.setFillColor(color);
 		button.setFilled(true);
 		add(button);
 		
@@ -25,6 +25,18 @@ public class StateButton extends GCompound {
 		return buttonType;
 	}
 	
+	public void setFillColor(Color color) {
+		this.color = color;
+		button.setFillColor(color);
+	}
+	
+	public boolean isOn() {
+		if (color == Color.GREEN) return true;
+		return false;
+	}
+	
 	private
 		int buttonType;
+		GRoundRect button;
+		Color color;
 }
