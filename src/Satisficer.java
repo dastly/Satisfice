@@ -34,8 +34,6 @@ public class Satisficer extends GraphicsProgram {
 	int VIS_Y = 60;
 	int ADD = 0; // add button
 	int VIEW = 1; // view button
-	int CURRENT = 0;
-	int HIGHEST = 1;
 	int LABEL_OFFSET_BOTTOM = 25;
 	int LABEL_WIDTH = 100;
 	int LABEL_HEIGHT = 50;
@@ -66,6 +64,7 @@ public class Satisficer extends GraphicsProgram {
 	double highScore = 0;
 	StateButton highest = null;
 	StateButton current = null;
+	StateType state = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -102,14 +101,16 @@ public class Satisficer extends GraphicsProgram {
 			buttons.add(addButton);
 			buttons.add(viewButton);
 	    }
+
+	    current = new StateButton("CURRENT", StateType.CURRENT, Color.GREEN);
+	    current.setLocation(20, 20);
+	    add(current);
 	    
-	    highest = new StateButton("HIGHEST", HIGHEST, Color.GRAY);
-	    highest.setLocation(0, 20);
+	    highest = new StateButton("HIGHEST", StateType.HIGHEST, Color.GRAY);
+	    highest.setLocation(120, 20);
 	    add(highest);
 	    
-	    current = new StateButton("CURRENT", CURRENT, Color.GREEN);
-	    current.setLocation(100, 20);
-	    add(current);
+	    state = StateType.CURRENT;
 	    
 	    description = new TaskDescription();
 	    description.setLocation(BUTTON_SPACING, WINDOW_HEIGHT - DESCRIPTION_OFFSET_BOTTOM);
@@ -130,7 +131,7 @@ public class Satisficer extends GraphicsProgram {
 		bar = new ConstraintBar(flags, rooms);
 		add(bar);
 		bar.setLocation(BAR_X, BAR_Y);
-		bar.setFlags();
+		bar.setFlags(state);
 		
 		visualiser = new Visualiser(getSelectedConstraints(), rooms);
 		add(visualiser);
@@ -224,36 +225,36 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		if (selected instanceof StateButton) {
-			if (((StateButton)selected).getType() == CURRENT) {
-				showRooms(CURRENT);
+			if (((StateButton)selected).getType() == StateType.CURRENT) {
 				highest.setFillColor(Color.GRAY);
 				current.setFillColor(Color.GREEN);
-			} else if (((StateButton)selected).getType() == HIGHEST) {
-				showRooms(HIGHEST);
+				state = StateType.CURRENT;
+			} else if (((StateButton)selected).getType() == StateType.HIGHEST) {
 				highest.setFillColor(Color.GREEN);
 				current.setFillColor(Color.GRAY);
+				state = StateType.HIGHEST;
 			}
+			bar.setFlags(state);
+			showRooms();
 		}
 		update();
 	}
 	
-	private void showRooms(int state) {
-		if (state == CURRENT) {
+	private void showRooms() {
+		if (state == StateType.CURRENT) {
 			for (Room room: highestRooms) {
 				remove(room);
 			}
 			for (Room room: rooms) {
 				add(room);
 			}
-			System.out.println(rooms);
-		} else if (state == HIGHEST) {
+		} else if (state == StateType.HIGHEST) {
 			for (Room room: rooms) {
 				remove(room);
 			}
 			for (Room room: highestRooms) {
 				add(room);
 			}
-			System.out.println(highestRooms);
 		}
 	}
 
@@ -270,7 +271,7 @@ public class Satisficer extends GraphicsProgram {
 			Room room = new Room(roomType.width(), roomType.height(), roomType);
 			room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 			add(room);
-			if (highest.isOn()) {
+			if (state == StateType.HIGHEST) {
 				rooms = (Vector<Room>) highestRooms.clone();
 				highest.setFillColor(Color.GRAY);
 				current.setFillColor(Color.GREEN);
@@ -433,10 +434,10 @@ public class Satisficer extends GraphicsProgram {
 	}
 	
 	public void update() {
-		bar.setFlags();
+		bar.setFlags(state);
 		visualiser.update(getSelectedConstraints(), rooms);
-		if (bar.getScore() > highScore) {
-			highScore = bar.getScore();
+		if (bar.getScore(state) > highScore) {
+			highScore = bar.getScore(state);
 			highestRooms = (Vector<Room>) rooms.clone();
 		}
 	}

@@ -61,7 +61,7 @@ public class ConstraintBar extends GCompound {
 	  }
 	}
 	
-	public void setFlags(){
+	public void setFlags(StateType state){
 		for(Flag flag: flags){
 			double satisfaction = flag.satisfaction(rooms);
 			
@@ -76,21 +76,29 @@ public class ConstraintBar extends GCompound {
 			flag.setLocation(x, BAR_HEIGHT * (1 - satisfaction));
 		}
 		adjustOverlaps();
-		setScore();
+		setScore(state);
 	}
 	
-	public double getScore() {
-		return overallScore; 
+	public double getScore(StateType state) {
+		if (state == StateType.CURRENT) {
+			return currentScore;
+		} else {
+			return highestScore;
+		}
 	}
 	
-	private void setScore() {
+	private void setScore(StateType state) {
 		double satisfaction = 0;
 		for (Flag flag: flags) {
 			if (flag.getName() == "ADJ" || flag.getName() == "COUNT" || flag.getName() == "SIZE") {
 				satisfaction += flag.satisfaction(rooms);
 			}
 		}
-		this.overallScore = satisfaction;
+		if (state == StateType.CURRENT) {
+			this.currentScore = satisfaction;
+		} else if (state == StateType.HIGHEST) {
+			this.highestScore = satisfaction;
+		}
 	}
 	
 	private void adjustOverlaps(){
@@ -124,7 +132,8 @@ public class ConstraintBar extends GCompound {
 	
 	private
 		Vector<Room> rooms;
-		double overallScore;
+		double currentScore;
+		double highestScore;
 	
 	
 //	private void setSoftFlag(SoftFlag flag) {

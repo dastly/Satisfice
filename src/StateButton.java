@@ -9,7 +9,7 @@ public class StateButton extends GCompound {
 	int WIDTH = 80;
 	int HEIGHT = 20;
 	
-	public StateButton(String name, int buttonType, Color color) {
+	public StateButton(String name, StateType buttonType, Color color) {
 		this.buttonType = buttonType;
 		this.button = new GRoundRect(WIDTH, HEIGHT);
 		button.setFillColor(color);
@@ -21,7 +21,7 @@ public class StateButton extends GCompound {
 		add(label);
 	}
 	
-	public int getType() {
+	public StateType getType() {
 		return buttonType;
 	}
 	
@@ -36,7 +36,7 @@ public class StateButton extends GCompound {
 	}
 	
 	private
-		int buttonType;
+		StateType buttonType;
 		GRoundRect button;
 		Color color;
 }
