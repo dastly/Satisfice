@@ -4,11 +4,14 @@ import acm.graphics.*;
 
 
 public class Floorplan extends GCompound {
-
-	int FLOOR_WIDTH = 500;
-	int FLOOR_HEIGHT = 500;
-	int FLOOR_MID_WIDTH = 260;
-	int FLOOR_MID_HEIGHT = 260;
+	
+	//ft*4 = pxl
+	double CELL_WIDTH = 4.0 * Math.sqrt(10);
+	double NUM_CELLS = 40;
+	double FLOOR_WIDTH = CELL_WIDTH * NUM_CELLS;
+	double FLOOR_HEIGHT = CELL_WIDTH * NUM_CELLS;
+	double FLOOR_MID_WIDTH = CELL_WIDTH * NUM_CELLS/2 + CELL_WIDTH;
+	double FLOOR_MID_HEIGHT = CELL_WIDTH * NUM_CELLS/2 + CELL_WIDTH;
 	
 	GPoint[] vertices = {new GPoint(0, 0),
 			new GPoint(0, FLOOR_HEIGHT),
@@ -17,7 +20,6 @@ public class Floorplan extends GCompound {
 			new GPoint(FLOOR_MID_WIDTH, FLOOR_MID_HEIGHT),
 			new GPoint(FLOOR_MID_WIDTH, 0)};
 	
-	double CELL_WIDTH = 20;
 	
 	public Floorplan() {
 		outline = new GPolygon(vertices);
