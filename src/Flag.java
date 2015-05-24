@@ -49,9 +49,9 @@ public class Flag extends GCompound {
 		if(flagRooms.isEmpty()) return 0.0;
 		for(Room room: flagRooms){
 			//if(floorPlanContains(room))
-				if(type == FlagType.ADJACENCY)
+				if(type == FlagType.ADJACENCY || type == FlagType.SELADJACENCY)
 					score += room.getAdjacencyConstraint().evaluate(allRooms);
-				if(type == FlagType.SIZE)
+				if(type == FlagType.SIZE || type == FlagType.SELSIZE)
 					score += room.getSizeConstraint().evaluate();
 		}
 		return score/flagRooms.size();
