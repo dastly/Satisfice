@@ -83,6 +83,19 @@ public class Room extends GCompound {
 		return room.getHeight();
 	}
 	
+//	public double getHighestX(){
+//		return highestX;
+//	}
+//	
+//	public double getHighestY(){
+//		return highestY;
+//	}
+//	
+//	public void setHighestXY(double highestX, double highestY){
+//		this.highestX = highestX;
+//		this.highestX = highestY;
+//	}
+	
 	public void setSize(double width, double height) {
 		//if(width < 0) width = 0;
 		//(height < 0) height = 0;
@@ -142,10 +155,6 @@ public class Room extends GCompound {
 		return sc;
 	}
 	
-	public void saveLocation(GPoint location) {
-		this.location = location;
-	}
-	
 	private
 		RoomType type;
 		GRect room;
@@ -155,8 +164,8 @@ public class Room extends GCompound {
 		Vector<Constraint> constraints;
 		AdjacencyConstraint ac;
 		SizeConstraint sc;
-		GPoint location;
-		
+//		double highestX;
+//		double highestY;
 		//GPolygon room; //if using rotate
 		//RotateDiamond lowerLeft;
 }

@@ -6,10 +6,8 @@ import acm.graphics.*;
 
 public class Flag extends GCompound {
 	
-	public Flag(String name, Vector<Button> buttons, Vector<Room> rooms, FlagType type, boolean onLeft) {
+	public Flag(String name, FlagType type, boolean onLeft) {
 		this.name = name;
-		this.buttons = buttons;
-		this.rooms = rooms;
 		this.type = type;
 		this.onLeft = onLeft;
 		label = new GLabel(name);
@@ -20,16 +18,16 @@ public class Flag extends GCompound {
 		add(label);
 	}
 	
-	public Vector<Constraint> getConstraints(){
-		Vector<Constraint> constraints = new Vector<Constraint>();
-		for(Button button: buttons){
-			constraints.addAll(button.getConstraints());
-		}
-		for(Room room: rooms){
-			constraints.addAll(room.getConstraints());
-		}
-		return constraints;
-	}
+//	public Vector<Constraint> getConstraints(){
+//		Vector<Constraint> constraints = new Vector<Constraint>();
+//		for(Button button: buttons){
+//			constraints.addAll(button.getConstraints());
+//		}
+//		for(Room room: rooms){
+//			constraints.addAll(room.getConstraints());
+//		}
+//		return constraints;
+//	}
 	
 	public void setLabel(double satisfaction){
 		this.label.setLabel(name + ": " + satisfaction);
@@ -38,32 +36,25 @@ public class Flag extends GCompound {
 		this.label.setLocation(2, this.label.getAscent()-shape.getHeight()/2);
 	}
 	
-	public double satisfaction(Vector<Room> allRooms) {
+	public double satisfaction(Vector<Button> buttons, Vector<Room> allRooms, Vector<Room> selectedRooms) {
 		double score = 0.0;
+		Vector<Room> flagRooms = (type == FlagType.SELADJACENCY || type == FlagType.SELSIZE) ? selectedRooms : allRooms;
 		
 		if(type == FlagType.COUNT){
 			for(Button button: buttons){
-				score += button.getCountConstraint().evaluate(rooms);
+				score += button.getCountConstraint().evaluate(allRooms);
 			}
 			return score/buttons.size();
 		}
-		if(rooms.isEmpty()) return 0.0;
-		for(Room room: rooms){
+		if(flagRooms.isEmpty()) return 0.0;
+		for(Room room: flagRooms){
 			//if(floorPlanContains(room))
 				if(type == FlagType.ADJACENCY)
 					score += room.getAdjacencyConstraint().evaluate(allRooms);
 				if(type == FlagType.SIZE)
 					score += room.getSizeConstraint().evaluate();
 		}
-		return score/rooms.size();
-	}
-	
-	public Vector<Room> getRooms(){
-		return rooms;
-	}
-	
-	public Vector<Button> getButtons(){
-		return buttons;
+		return score/flagRooms.size();
 	}
 	
 	public boolean onLeft(){
@@ -79,10 +70,12 @@ public class Flag extends GCompound {
 		return name;
 	}
 	
+	public FlagType getType(){
+		return type;
+	}
+	
 	private
 		String name;
-		Vector<Button> buttons;
-		Vector<Room> rooms;
 		GRoundRect shape;
 		GLabel label;
 		boolean onLeft;

@@ -29,8 +29,7 @@ public class ConstraintBar extends GCompound {
 	GRect bar = null;
 	Vector<Flag> flags = null;
 	
-	public ConstraintBar(Vector<Flag> flags, Vector<Room> rooms) {
-		this.rooms = rooms;
+	public ConstraintBar(Vector<Flag> flags) {
 		bar = new GRect(BAR_WIDTH, BAR_HEIGHT);
 		bar.setFillColor(Color.BLUE);
 		add(bar);
@@ -61,9 +60,9 @@ public class ConstraintBar extends GCompound {
 	  }
 	}
 	
-	public void setFlags(StateType state){
+	public void setFlags(Vector<Button> buttons, Vector<Room> allRooms, Vector<Room> selectedRooms){
 		for(Flag flag: flags){
-			double satisfaction = flag.satisfaction(rooms);
+			double satisfaction = flag.satisfaction(buttons, allRooms, selectedRooms);
 			
 			int red = (int) (color2.getRed() * (1 - satisfaction) + color1.getRed() * satisfaction);
 	        int green = (int) (color2.getGreen() * (1 - satisfaction) + color1.getGreen() * satisfaction);
@@ -75,38 +74,16 @@ public class ConstraintBar extends GCompound {
 			double x = (flag.onLeft()) ? - FLAG_OFFSET - flag.getWidth() : BAR_WIDTH + FLAG_OFFSET;
 			flag.setLocation(x, BAR_HEIGHT * (1 - satisfaction));
 		}
-		adjustOverlaps();
-		setScore(state);
+		adjustOverlaps(buttons, allRooms, selectedRooms);
+		//setScore(state);
 	}
 	
-	public double getScore(StateType state) {
-		if (state == StateType.CURRENT) {
-			return currentScore;
-		} else {
-			return highestScore;
-		}
-	}
-	
-	private void setScore(StateType state) {
-		double satisfaction = 0;
-		for (Flag flag: flags) {
-			if (flag.getName() == "ADJ" || flag.getName() == "COUNT" || flag.getName() == "SIZE") {
-				satisfaction += flag.satisfaction(rooms);
-			}
-		}
-		if (state == StateType.CURRENT) {
-			this.currentScore = satisfaction;
-		} else if (state == StateType.HIGHEST) {
-			this.highestScore = satisfaction;
-		}
-	}
-	
-	private void adjustOverlaps(){
+	private void adjustOverlaps(Vector<Button> buttons, Vector<Room> allRooms, Vector<Room> selectedRooms){
 		for(Flag flag: flags){
 			while(overlapsFlag(flag) != null){
 				Flag otherFlag = overlapsFlag(flag);
-				double satisfaction = flag.satisfaction(rooms);
-				double satisfactionOther = otherFlag.satisfaction(rooms);
+				double satisfaction = flag.satisfaction(buttons, allRooms, selectedRooms);
+				double satisfactionOther = otherFlag.satisfaction(buttons, allRooms, selectedRooms);
 				if(satisfaction <= satisfactionOther){
 					flag.move(0, heightDiff(flag, otherFlag) + 1);
 				} else {
@@ -130,10 +107,6 @@ public class ConstraintBar extends GCompound {
 		return null;
 	}
 	
-	private
-		Vector<Room> rooms;
-		double currentScore;
-		double highestScore;
 	
 	
 //	private void setSoftFlag(SoftFlag flag) {
