@@ -5,7 +5,7 @@ public class SizeConstraint extends Constraint {
 
 	double PXL_TO_FT = 25.0/400.0;
 	//double DROP_OFF_FACTOR = 50.0;
-	double INITIAL_SIZE_SCORE = 0.5;
+	double INITIAL_SIZE_SCORE = 0.75;
 	
 	public SizeConstraint(Room room) {
 		super(room);
@@ -18,6 +18,7 @@ public class SizeConstraint extends Constraint {
 		return room.getSqFootage() >= PXL_TO_FT * room.getType().width()*room.getType().height() - 1;
 	}
 
+	//Returns value between 0.0 and 1.0
 	public double evaluate() {
 		if(!satisfied()) return 0.0;
 		Room room = getRoom();

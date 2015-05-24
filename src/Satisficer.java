@@ -25,6 +25,13 @@ import javax.swing.JPanel;
 
 public class Satisficer extends GraphicsProgram {
 	
+	//Settings
+	boolean TREATMENT = true;
+	boolean AFFINITY_MATRIX = false;
+	boolean SELECTED_FLAGS = true;
+	boolean ADDITIONAL_HIGH_SCORES = false;
+	boolean VERBOSE = true;
+	
 	//Constants
 	int WINDOW_WIDTH = 1800;
 	int WINDOW_HEIGHT = 700;
@@ -54,15 +61,24 @@ public class Satisficer extends GraphicsProgram {
 	//Globals
 	Vector<Room> currentRooms = new Vector<Room>();
 	Vector<Room> highestRooms = new Vector<Room>();
+	Vector<Room> highestAdjacencyRooms = new Vector<Room>();
+	Vector<Room> highestSizeRooms = new Vector<Room>();
+	Vector<Room> highestCountRooms = new Vector<Room>();
 	Vector<Room> selectedRooms = new Vector<Room>();
 	
-	
+	Vector<Button> buttons = new Vector<Button>();
 	double highScore = 0;
-	StateButton highest = null;
+	double highAdjacencyScore = 0;
+	double highSizeScore = 0;
+	double highCountScore = 0;
 	StateButton current = null;
+	StateButton highest = null;
+	StateButton highestAdjacency = null;
+	StateButton highestSize = null;
+	StateButton highestCount = null;
+	Vector<StateButton> stateButtons = new Vector<StateButton>();
 	StateType state = null;
 	
-	Vector<Button> buttons = new Vector<Button>();
 	Floorplan floor = null;
 	ConstraintBar bar = null;
 	Visualiser visualiser = null;
@@ -106,16 +122,33 @@ public class Satisficer extends GraphicsProgram {
 			buttons.add(addButton);
 			buttons.add(viewButton);
 	    }
-
+	    
 	    current = new StateButton("CURRENT", StateType.CURRENT, Color.GREEN);
 	    current.setLocation(20, 20);
-	    add(current);
+	    if(TREATMENT) add(current);
+	    state = StateType.CURRENT;
 	    
 	    highest = new StateButton("HIGHEST", StateType.HIGHEST, Color.GRAY);
-	    highest.setLocation(120, 20);
-	    add(highest);
+		highest.setLocation(120, 20);
+		if(TREATMENT) add(highest);
+		    
+		highestAdjacency = new StateButton("HIGHEST ADJ", StateType.HIGHEST_ADJACENCY, Color.GRAY);
+		highestAdjacency.setLocation(220, 20);
+		if(TREATMENT && ADDITIONAL_HIGH_SCORES) add(highestAdjacency);
 	    
-	    state = StateType.CURRENT;
+	    highestSize = new StateButton("HIGHEST SIZE", StateType.HIGHEST_SIZE, Color.GRAY);
+	    highestSize.setLocation(320, 20);
+		if(TREATMENT && ADDITIONAL_HIGH_SCORES) add(highestSize);
+	    
+	    highestCount = new StateButton("HIGHEST COUNT", StateType.HIGHEST_COUNT, Color.GRAY);
+	    highestCount.setLocation(420, 20);
+		if(TREATMENT && ADDITIONAL_HIGH_SCORES) add(highestCount);
+		
+		stateButtons.add(current);
+		stateButtons.add(highest);
+		stateButtons.add(highestAdjacency);
+		stateButtons.add(highestCount);
+		stateButtons.add(highestSize);
 	    
 	    description = new TaskDescription();
 	    description.setLocation(BUTTON_SPACING, WINDOW_HEIGHT - DESCRIPTION_OFFSET_BOTTOM);
@@ -130,24 +163,24 @@ public class Satisficer extends GraphicsProgram {
 		flags.add(adj);
 		flags.add(size);
 		flags.add(count);
-		flags.add(selectedadj);
-		flags.add(selectedsize);
+		if(SELECTED_FLAGS) flags.add(selectedadj);
+		if(SELECTED_FLAGS) flags.add(selectedsize);
 		
 		bar = new ConstraintBar(flags);
-		add(bar);
+		if(TREATMENT) add(bar);
 		bar.setLocation(BAR_X, BAR_Y);
 		bar.setFlags(buttons, currentRooms, selectedRooms);
 		
-		visualiser = new Visualiser(getSelectedConstraints(currentRooms), currentRooms);
+		visualiser = new Visualiser(getSelectedConstraints(currentRooms), currentRooms, TREATMENT, AFFINITY_MATRIX);
 		add(visualiser);
 		visualiser.setLocation(VIS_X, VIS_Y);
 		
 		up = new ScrollButton(UP);
 		up.setLocation(VIS_X + SCROLL_RIGHT_OFFSET, VIS_Y);
-		add(up);
+		if(TREATMENT) add(up);
 		down = new ScrollButton(DOWN);
 		down.setLocation(VIS_X + SCROLL_RIGHT_OFFSET, VIS_Y + SCROLL_BOT_OFFSET);
-		add(down);
+		if(TREATMENT) add(down);
 		
 		addMouseListeners();
 		addKeyListeners();
@@ -201,7 +234,7 @@ public class Satisficer extends GraphicsProgram {
 			GObject selectedInnerObject = room.getElementAt(pt.getX(),pt.getY());
 
 			if (selectedInnerObject instanceof RemoveCircle){
-				if (state == StateType.HIGHEST) {
+				if (state != StateType.CURRENT) {
 					switchToCurrent();
 				}
 				for(Room sroom: selectedRooms){
@@ -212,38 +245,87 @@ public class Satisficer extends GraphicsProgram {
 			}
 		}
 		if (selected instanceof StateButton) {
-			if (((StateButton)selected).getType() == StateType.CURRENT) {
-				highest.setFillColor(Color.GRAY);
-				current.setFillColor(Color.GREEN);
-				state = StateType.CURRENT;
-			} else if (((StateButton)selected).getType() == StateType.HIGHEST) {
-				highest.setFillColor(Color.GREEN);
-				current.setFillColor(Color.GRAY);
-				state = StateType.HIGHEST;
+			StateType stateType = ((StateButton)selected).getType();
+			for(StateButton stateButton: stateButtons){
+				if(stateButton.getType() == stateType){
+					stateButton.setFillColor(Color.GREEN);
+				} else {
+					stateButton.setFillColor(Color.GRAY);
+				}
 			}
-			showRooms();
+			showRooms(state, stateType);
+			state = stateType;
+//			if (((StateButton)selected).getType() == StateType.CURRENT) {
+//				highest.setFillColor(Color.GRAY);
+//				current.setFillColor(Color.GREEN);
+//				highestAdjacency.setFillColor(Color.GRAY);
+//				state = StateType.CURRENT;
+//			} else if (((StateButton)selected).getType() == StateType.HIGHEST) {
+//				highest.setFillColor(Color.GREEN);
+//				current.setFillColor(Color.GRAY);
+//				highestAdjacency.setFillColor(Color.GRAY);
+//				state = StateType.HIGHEST;
+//			} else if (((StateButton)selected).getType() == StateType.HIGHEST_ADJACENCY) {
+//				highestAdjacency.setFillColor(Color.GREEN);
+//				current.setFillColor(Color.GRAY);
+//				highest.setFillColor(Color.GRAY);
+//				state = StateType.HIGHEST_ADJACENCY;
+//			}
+			
 		}
 		update();
 	}
 	
-	private void showRooms() {
-		if (state == StateType.CURRENT) {
-			for (Room room: highestRooms) {
-				remove(room);
-			}
-			for (Room room: currentRooms) {
-				add(room);
-			}
-		} else if (state == StateType.HIGHEST) {
-			for (Room room: currentRooms) {
-				remove(room);
-			}
-			for (Room room: highestRooms) {
-				add(room);
-//				room.setLocation(room.getHighestX(), room.getHighestY());
-			}
-			System.out.println("HighestRooms");
+	private void showRooms(StateType previousStateType, StateType currentStateType) {
+		Vector<Room> rooms = roomsSwitch(previousStateType);
+		for(Room room : rooms){
+			remove(room);
 		}
+		
+		rooms = roomsSwitch(currentStateType);
+		for(Room room : rooms){
+			add(room);
+		}
+		
+//		for(StateType stateType: StateType.values()){
+//			Vector<Room> rooms = roomsSwitch(stateType);
+//			for(Room room : rooms){
+//				if(state == stateType) add(room);
+//				else remove(room);
+//			}
+//		}
+//		
+//		if (state == StateType.CURRENT) {
+//			for (Room room: highestRooms) {
+//				remove(room);
+//			}
+//			for (Room room: highestAdjacencyRooms) {
+//				remove(room);
+//			}
+//			for (Room room: currentRooms) {
+//				add(room);
+//			}
+//		} else if (state == StateType.HIGHEST) {
+//			for (Room room: currentRooms) {
+//				remove(room);
+//			}
+//			for (Room room: highestAdjacencyRooms) {
+//				remove(room);
+//			}
+//			for (Room room: highestRooms) {
+//				add(room);
+//			}
+//		} else if (state == StateType.HIGHEST_ADJACENCY){
+//			for (Room room: currentRooms) {
+//				remove(room);
+//			}
+//			for (Room room: highestRooms) {
+//				remove(room);
+//			}
+//			for (Room room: highestAdjacencyRooms) {
+//				add(room);
+//			}
+//		}
 	}
 
 	/*
@@ -259,7 +341,7 @@ public class Satisficer extends GraphicsProgram {
 			Room room = new Room(roomType.width(), roomType.height(), roomType);
 			room.setLocation(button.getX(),button.getY()-room.getHeight()-ROOM_OFFSET_BOTTOM);
 			add(room);
-			if (state == StateType.HIGHEST) {
+			if (state != StateType.CURRENT) {
 				switchToCurrent();
 			}
 			currentRooms.add(room);
@@ -352,7 +434,7 @@ public class Satisficer extends GraphicsProgram {
 		double deltaX = e.getX() - pressX;
 		double deltaY = e.getY() - pressY;
 		//if(selectedObject == null) return;
-		if(state == StateType.HIGHEST) switchToCurrent();
+		if(state != StateType.CURRENT) switchToCurrent();
 		if(selecting){
 			groupSelector.setSize(groupSelector.getWidth() + deltaX, groupSelector.getHeight() + deltaY);
 		} else {
@@ -389,10 +471,10 @@ public class Satisficer extends GraphicsProgram {
 	 * 
 	 * Should also update visualization.
 	 */
+	
 	public void mouseReleased(MouseEvent e){
-		//if(object != null) System.out.println(object.getX() - 10);
 		if(selecting){
-			Vector<Room> rooms = (state == StateType.CURRENT) ? currentRooms : highestRooms;
+			Vector<Room> rooms = roomsSwitch(state);//(state == StateType.CURRENT) ? currentRooms : highestRooms;
 			for(Room room: rooms){
 				if(groupSelector.getBounds().intersects(room.getBounds())){
 					room.highlight();
@@ -426,44 +508,132 @@ public class Satisficer extends GraphicsProgram {
 	}
 	
 	private void switchToCurrent(){
-		currentRooms = highestRooms;
-		deepCloneHighestFromCurrent();
-		highest.setFillColor(Color.GRAY);
-		current.setFillColor(Color.GREEN);
+		currentRooms = roomsSwitch(state);//highestRooms;
+		deepCloneFromCurrent(state);
+		
+		for(StateButton stateButton: stateButtons){
+			if(stateButton.getType() == StateType.CURRENT){
+				stateButton.setFillColor(Color.GREEN);
+			} else {
+				stateButton.setFillColor(Color.GRAY);
+			}
+		}
+//		highest.setFillColor(Color.GRAY);
+//		highestAdjacency.setFillColor(Color.GRAY);
+//		current.setFillColor(Color.GREEN);
+		showRooms(state, StateType.CURRENT);
 		state = StateType.CURRENT;
-		showRooms();
-		System.out.print("Switching to current (clone highest from current)");
+		if(VERBOSE) System.out.print("Switching to current (clone highest from current)");
 	}
 	
-	public void update() {
-//		System.out.println("Current Rooms");
-//		System.out.println(currentRooms);
-//		System.out.println("Highest Rooms");
-//		System.out.println(highestRooms);
+	public Vector<Room> roomsSwitch(StateType stateType){
+		switch(stateType){
+			case CURRENT:
+				return currentRooms;
+			case HIGHEST:
+				return highestRooms;
+			case HIGHEST_ADJACENCY:
+				return highestAdjacencyRooms;
+			case HIGHEST_SIZE:
+				return highestSizeRooms;
+			case HIGHEST_COUNT:
+				return highestCountRooms;
+		}
+		return null;
+	}
+	
+	public void update() {		
 		
-		if(state == StateType.CURRENT){
-			bar.setFlags(buttons, currentRooms, selectedRooms);
-			visualiser.update(getSelectedConstraints(currentRooms), currentRooms);
-		} else {
-			bar.setFlags(buttons, highestRooms, selectedRooms);
-			visualiser.update(getSelectedConstraints(highestRooms), highestRooms);
+		bar.setFlags(buttons, roomsSwitch(state), selectedRooms);
+		visualiser.update(getSelectedConstraints(roomsSwitch(state)), roomsSwitch(state));
+		
+		if (getScore(true, null, StateType.CURRENT) >= highScore) {
+			highScore = getScore(true, null, StateType.CURRENT);
+			deepCloneFromCurrent(StateType.HIGHEST);
+			if(VERBOSE) System.out.println("Highest TOTAL set: "+highScore);
 		}
-		if (getScore() > highScore) {
-			highScore = getScore();
-			deepCloneHighestFromCurrent();
-			System.out.println("Highest Rooms set: "+highScore+" (clone highest from current)");
+		if (higherScoring(false, FlagType.ADJACENCY, StateType.HIGHEST_ADJACENCY)) {
+			highAdjacencyScore = getScore(false, FlagType.ADJACENCY, StateType.CURRENT);
+			deepCloneFromCurrent(StateType.HIGHEST_ADJACENCY);
+			if(VERBOSE) System.out.println("Highest ADJ set: "+highAdjacencyScore);
 		}
+		if (higherScoring(false, FlagType.SIZE, StateType.HIGHEST_SIZE)) {
+			highSizeScore = getScore(false, FlagType.SIZE, StateType.CURRENT);
+			deepCloneFromCurrent(StateType.HIGHEST_SIZE);
+			if(VERBOSE) System.out.println("Highest SIZE set: "+highSizeScore);
+		}
+		if (higherScoring(false, FlagType.COUNT, StateType.HIGHEST_COUNT)) {
+			highCountScore = getScore(false, FlagType.COUNT, StateType.CURRENT);
+			deepCloneFromCurrent(StateType.HIGHEST_COUNT);
+			if(VERBOSE) System.out.println("Highest COUNT set: "+highCountScore);
+		}
+	}
+	
+	//Does not work for current.  Calculates based off of saved rooms
+	private boolean higherScoring(boolean TOTAL, FlagType flagType, StateType stateType){
+		if(getScore(TOTAL, flagType, StateType.CURRENT) > getScore(TOTAL, flagType, stateType)) return true;
+		if(getScore(TOTAL, flagType, StateType.CURRENT) == getScore(TOTAL, flagType, stateType)){
+			return getScore(true, null, StateType.CURRENT) > getScore(true, null, stateType);
+		}
+		return false;
 	}
 	
 	//Needed to work with the Stanford Graphics Program
-	private void deepCloneHighestFromCurrent(){
-		highestRooms = new Vector<Room>();
+	private void deepCloneFromCurrent(StateType stateType) {
+		Vector<Room> copyRooms = new Vector<Room>();
 		for(Room room: currentRooms){
 			Room copyRoom = new Room(room.getWidth(),room.getHeight(),room.getType());
 			copyRoom.setLocation(room.getX(),room.getY());
-			highestRooms.add(copyRoom);
+			copyRooms.add(copyRoom);
 		}
+		switch(stateType){
+			case CURRENT:
+				currentRooms = copyRooms;
+			case HIGHEST:
+				highestRooms = copyRooms;
+			case HIGHEST_ADJACENCY:
+				highestAdjacencyRooms = copyRooms;
+			case HIGHEST_SIZE:
+				highestSizeRooms = copyRooms;
+			case HIGHEST_COUNT:
+				highestCountRooms = copyRooms;
+		}
+		if(VERBOSE) System.out.println("Cloned");
 	}
+
+	private double getScore(boolean TOTAL, FlagType flagType, StateType stateType) {
+		double satisfaction = 0.0;
+		int count = 0;
+		for (Flag flag: bar.flags) {
+			if (flag.getType() == FlagType.ADJACENCY || flag.getType() == FlagType.COUNT || flag.getType() == FlagType.SIZE) {	
+				if (TOTAL || flag.getType() == flagType) {
+					satisfaction += flag.satisfaction(buttons, roomsSwitch(stateType), selectedRooms);
+				}
+			count++;
+			}
+		}
+		return satisfaction/(double)count;
+	}
+
+//	private void deepCloneHighestFromCurrent(){
+//		highestRooms = new Vector<Room>();
+//		for(Room room: currentRooms){
+//			Room copyRoom = new Room(room.getWidth(),room.getHeight(),room.getType());
+//			copyRoom.setLocation(room.getX(),room.getY());
+//			highestRooms.add(copyRoom);
+//		}
+//	}
+	
+//	private double getScore() { //of current rooms
+//		double satisfaction = 0.0;
+//		for (Flag flag: bar.flags) {
+//			if (flag.getType() == FlagType.ADJACENCY || flag.getType() == FlagType.COUNT || flag.getType() == FlagType.SIZE) {
+//				satisfaction += flag.satisfaction(buttons, currentRooms, selectedRooms);
+//			}
+//		}
+//		satisfaction /= 3.0;
+//		return satisfaction;
+//	}
 	
 	private Vector<Constraint> getSelectedConstraints(Vector<Room> rooms) {
 		Vector<Constraint> constraints = new Vector<Constraint>();
@@ -478,19 +648,6 @@ public class Satisficer extends GraphicsProgram {
 		}
 		return constraints;
 	}
-
-	private double getScore() { //of current rooms
-		double satisfaction = 0.0;
-		for (Flag flag: bar.flags) {
-			if (flag.getType() == FlagType.ADJACENCY || flag.getType() == FlagType.COUNT || flag.getType() == FlagType.SIZE) {
-				satisfaction += flag.satisfaction(buttons, currentRooms, selectedRooms);
-			}
-		}
-		satisfaction /= 3.0;
-		//System.out.println("getScore() :" + satisfaction);
-		return satisfaction;
-	}
-	
 	
 //	//TODO
 //	double computeRoomSizeScore(){

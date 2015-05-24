@@ -44,10 +44,10 @@ public class Visualiser extends GCompound {
 	
 	ConstraintsTable table = null;
 	
-	public Visualiser(Vector<Constraint> constraints, Vector<Room> rooms) {
-		showAffinityMatrix();
-		table = new ConstraintsTable(constraints, rooms);
-		add(table);
+	public Visualiser(Vector<Constraint> constraints, Vector<Room> rooms, boolean TREATMENT, boolean AFFINITY_MATRIX) {
+		if(AFFINITY_MATRIX) showAffinityMatrix();
+		if(TREATMENT) table = new ConstraintsTable(constraints, rooms);
+		if(TREATMENT) add(table);
 		update(constraints, rooms);
 	}
 	
@@ -69,6 +69,7 @@ public class Visualiser extends GCompound {
 	}
 	
 	public void update(Vector<Constraint> constraints, Vector<Room> rooms) {
+		if(table == null) return;
 		removeAll();
 		add(table);
 		table.update(constraints, rooms);

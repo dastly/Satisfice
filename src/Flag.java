@@ -36,6 +36,7 @@ public class Flag extends GCompound {
 		this.label.setLocation(2, this.label.getAscent()-shape.getHeight()/2);
 	}
 	
+	//Returns value roughly between 0.0 and 1.0
 	public double satisfaction(Vector<Button> buttons, Vector<Room> allRooms, Vector<Room> selectedRooms) {
 		double score = 0.0;
 		Vector<Room> flagRooms = (type == FlagType.SELADJACENCY || type == FlagType.SELSIZE) ? selectedRooms : allRooms;

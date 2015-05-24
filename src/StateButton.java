@@ -6,7 +6,7 @@ import acm.graphics.GRoundRect;
 
 
 public class StateButton extends GCompound {
-	int WIDTH = 80;
+	int WIDTH = 100;
 	int HEIGHT = 20;
 	
 	public StateButton(String name, StateType buttonType, Color color) {
