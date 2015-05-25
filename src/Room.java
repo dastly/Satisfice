@@ -29,16 +29,16 @@ public class Room extends GCompound {
 	
 	public void createRoom(double width, double height, RoomType type) {
 		
-		room = new GRect(width, height);
+		shape = new GRect(width, height);
 		
 		//Rotation requires polygons
 		/*GPoint[] vertices = {new GPoint(0,0), new GPoint(width,0), new GPoint(width,height), new GPoint(0,height)};
 		room = new GPolygon(vertices);*/
 		
 		
-		room.setFillColor(Color.BLUE);
-		room.setFilled(true);
-		add(room);
+		shape.setFillColor(Color.BLUE);
+		shape.setFilled(true);
+		add(shape);
 		
 		lowerRight = new ResizeBlock(10,10);
 		lowerRight.setFillColor(Color.RED);
@@ -56,7 +56,7 @@ public class Room extends GCompound {
 		
 		placeControls();
 		this.type = type;
-		room.setFillColor(type.color());
+		shape.setFillColor(type.color());
 		add(new GLabel(type.label(), 5, 15));
 		size = new GLabel(getSqFootage() + "ft.^2", 5, 25);
 		add(size);
@@ -75,12 +75,12 @@ public class Room extends GCompound {
 
 	@Override
 	public double getWidth(){
-		return room.getWidth();
+		return shape.getWidth();
 	}
 	
 	@Override
 	public double getHeight(){
-		return room.getHeight();
+		return shape.getHeight();
 	}
 	
 //	public double getHighestX(){
@@ -99,7 +99,7 @@ public class Room extends GCompound {
 	public void setSize(double width, double height) {
 		//if(width < 0) width = 0;
 		//(height < 0) height = 0;
-		room.setSize(width, height);
+		shape.setSize(width, height);
 		placeControls();
 		size.setLabel(getSqFootage() + "ft.^2");
 	}
@@ -111,22 +111,26 @@ public class Room extends GCompound {
 //	}
 	
 	public double getSqFootage(){
-		int roundedDown = (int) Math.floor((room.getWidth()*room.getHeight())*PXL_TO_FT);
+		int roundedDown = (int) Math.floor((shape.getWidth()*shape.getHeight())*PXL_TO_FT);
 		if(roundedDown % 10 == 9) roundedDown += 1;
 		return (double) roundedDown;
 	}
 	
 	public void highlight(){
-		room.setColor(Color.YELLOW);
+		shape.setColor(Color.YELLOW);
+	}
+	
+	public void markRed() {
+		shape.setColor(Color.RED);		
 	}
 	
 	public void unhighlight(){
-		room.setColor(Color.BLACK);
+		shape.setColor(Color.BLACK);
 	}
 
 	private void placeControls() {
-		lowerRight.setLocation(room.getWidth()-5,room.getHeight()-5);
-		upperRight.setLocation(room.getWidth()-5,-5);
+		lowerRight.setLocation(shape.getWidth()-5,shape.getHeight()-5);
+		upperRight.setLocation(shape.getWidth()-5,-5);
 		//lowerLeft.setLocation(0,room.getHeight());
 		
 	}
@@ -157,7 +161,7 @@ public class Room extends GCompound {
 	
 	private
 		RoomType type;
-		GRect room;
+		GRect shape;
 		ResizeBlock lowerRight;
 		RemoveCircle upperRight;
 		GLabel size;
@@ -168,4 +172,6 @@ public class Room extends GCompound {
 //		double highestY;
 		//GPolygon room; //if using rotate
 		//RotateDiamond lowerLeft;
+
+		
 }
