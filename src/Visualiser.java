@@ -46,8 +46,8 @@ public class Visualiser extends GCompound {
 	
 	public Visualiser(Vector<Constraint> constraints, Vector<Room> rooms, boolean TREATMENT, boolean AFFINITY_MATRIX) {
 		if(AFFINITY_MATRIX) showAffinityMatrix();
-		if(TREATMENT) table = new ConstraintsTable(constraints, rooms);
-		if(TREATMENT) add(table);
+		table = new ConstraintsTable(constraints, rooms);
+		add(table);
 		update(constraints, rooms);
 	}
 	

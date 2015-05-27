@@ -26,12 +26,12 @@ import javax.swing.JPanel;
 public class Satisficer extends GraphicsProgram {
 	
 	//Settings
-	boolean TREATMENT = true;
-	boolean AFFINITY_MATRIX = true;
+	boolean TREATMENT = false; //Just change this between treatment and control
+	boolean AFFINITY_MATRIX = true; //Will only show or not in treatment condition
 	boolean SELECTED_FLAGS = true;
 	boolean ADDITIONAL_HIGH_SCORES = true;
-	boolean VERBOSE = true;
-	boolean RED_FOR_OVERLAP = true;
+	boolean VERBOSE = true; //change if you want
+	boolean RED_FOR_OVERLAP = true; //change if you want
 	boolean DO_NOT_SAVE_PLANS_WITH_OVERLAPS = true; 
 	boolean DO_NOT_SAVE_PLANS_OUTSIDE_BOUNDS = true;
 	//Constants
@@ -154,7 +154,7 @@ public class Satisficer extends GraphicsProgram {
 	    
 	    description = new TaskDescription();
 	    description.setLocation(BUTTON_SPACING, WINDOW_HEIGHT - DESCRIPTION_OFFSET_BOTTOM);
-	    add(description);
+	    if(TREATMENT) add(description);
 	    
 		Vector<Flag> flags = new Vector<Flag>();
 		Flag adj = new Flag("ADJ", FlagType.ADJACENCY, true);
@@ -174,7 +174,7 @@ public class Satisficer extends GraphicsProgram {
 		bar.setFlags(buttons, currentRooms, selectedRooms);
 		
 		visualiser = new Visualiser(getSelectedConstraints(currentRooms), currentRooms, TREATMENT, AFFINITY_MATRIX);
-		add(visualiser);
+		if(TREATMENT) add(visualiser);
 		visualiser.setLocation(VIS_X, VIS_Y);
 		
 		up = new ScrollButton(UP);
@@ -211,6 +211,11 @@ public class Satisficer extends GraphicsProgram {
 		int code = e.getKeyCode();
 		if (code == KeyEvent.VK_SHIFT) {
 			shift = true;
+		}
+		if (code == KeyEvent.VK_0){
+			if(TREATMENT) TREATMENT = false;
+			else TREATMENT = true;
+			showRooms(state, state);
 		}
 	}
 	
@@ -264,17 +269,20 @@ public class Satisficer extends GraphicsProgram {
 	private void showRooms(StateType previousStateType, StateType currentStateType) {
 		removeAll();
 		add(floor);
-		add(description);
-		add(visualiser);
-		add(up);
-		add(down);
-		add(bar);
 		for(Button button: buttons){
 			add(button);
 		}
-		for(StateButton stateButton: stateButtons){
-			add(stateButton);
+		if(TREATMENT){
+			add(description);
+			add(visualiser);
+			add(up);
+			add(down);
+			add(bar);
+			for(StateButton stateButton: stateButtons){
+				add(stateButton);
+			}
 		}
+		
 //		for(Room room : roomsSwitch(previousStateType)){
 //			remove(room);
 //		}
