@@ -28,6 +28,14 @@ public class Floorplan extends GCompound {
 		add(outline);
 		addGridLines(outline);
 	}
+	
+	public double midWidth(){
+		return FLOOR_MID_WIDTH;
+	}
+	
+	public double midHeight(){
+		return FLOOR_MID_HEIGHT;
+	}
 
 	private void addGridLines(GPolygon outline) {
 		double width = outline.getBounds().getWidth();

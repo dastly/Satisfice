@@ -34,6 +34,8 @@ public class Satisficer extends GraphicsProgram {
 	boolean RED_FOR_OVERLAP = true; //change if you want
 	boolean DO_NOT_SAVE_PLANS_WITH_OVERLAPS = true; 
 	boolean DO_NOT_SAVE_PLANS_OUTSIDE_BOUNDS = true;
+	boolean DO_NOT_SAVE_PLANS_OUTSIDE_GRAY_BOUNDS = true;
+	
 	//Constants
 	int WINDOW_WIDTH = 1800;
 	int WINDOW_HEIGHT = 700;
@@ -495,9 +497,18 @@ public class Satisficer extends GraphicsProgram {
 		boolean overlapaY = a.getY() > b.getY() + OVERLAP && a.getY() + OVERLAP < b.getY() + b.getHeight();
 		return (overlapbX || overlapaX) && (overlapbY || overlapaY);
 	}
+	
 	private boolean inBounds(Room a){
 		return a.getX() >= floor.getX() && a.getX() + a.getWidth() < floor.getX()+floor.getWidth()
 		&& a.getY() >= floor.getY() && a.getY() + a.getHeight() < floor.getY()+floor.getHeight(); 
+	}
+	
+	private boolean inGrayBounds(Room a){
+		return (a.getX() >= floor.getX() && a.getX() + a.getWidth() < floor.getX()+floor.getWidth()
+		&& a.getY() >= floor.getY() + floor.midHeight() && a.getY() + a.getHeight() < floor.getY()+floor.getHeight())
+		|| (a.getX() >= floor.getX() && a.getX() + a.getWidth() < floor.getX()+floor.midWidth()
+				&& a.getY() >= floor.getY() && a.getY() + a.getHeight() < floor.getY()+floor.getHeight())
+				; 
 	}
 	
 	private void switchToCurrent(){
@@ -538,6 +549,7 @@ public class Satisficer extends GraphicsProgram {
 		visualiser.update(getSelectedConstraints(roomsSwitch(state)), roomsSwitch(state));
 		if(DO_NOT_SAVE_PLANS_WITH_OVERLAPS && overlapExists()) return;
 		if(DO_NOT_SAVE_PLANS_OUTSIDE_BOUNDS && planOutsideBounds()) return;
+		if(DO_NOT_SAVE_PLANS_OUTSIDE_GRAY_BOUNDS && planOutsideGrayBounds()) return;
 		if (getScore(true, null, StateType.CURRENT) >= highScore) {
 			highScore = getScore(true, null, StateType.CURRENT);
 			deepCloneFromCurrent(StateType.HIGHEST);
@@ -586,6 +598,16 @@ public class Satisficer extends GraphicsProgram {
 			//if(!floor.getBounds().intersects(room.getBounds())) {
 			if(!inBounds(room)){
 				if(VERBOSE) System.out.println("Outside Bounds.");
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean planOutsideGrayBounds(){
+		for(Room room: currentRooms){
+			//if(!floor.getBounds().intersects(room.getBounds())) {
+			if(!inGrayBounds(room)){
+				if(VERBOSE) System.out.println("Outside Gray Bounds.");
 				return true;
 			}
 		}
