@@ -27,12 +27,13 @@ public class Satisficer extends GraphicsProgram {
 	
 	//Settings
 	boolean TREATMENT = true;
-	boolean AFFINITY_MATRIX = false;
+	boolean AFFINITY_MATRIX = true;
 	boolean SELECTED_FLAGS = true;
-	boolean ADDITIONAL_HIGH_SCORES = false;
+	boolean ADDITIONAL_HIGH_SCORES = true;
 	boolean VERBOSE = true;
-	boolean RED_FOR_OVERLAP = false;
-	
+	boolean RED_FOR_OVERLAP = true;
+	boolean DO_NOT_SAVE_PLANS_WITH_OVERLAPS = true; 
+	boolean DO_NOT_SAVE_PLANS_OUTSIDE_BOUNDS = true;
 	//Constants
 	int WINDOW_WIDTH = 1800;
 	int WINDOW_HEIGHT = 700;
@@ -261,15 +262,27 @@ public class Satisficer extends GraphicsProgram {
 	}
 	
 	private void showRooms(StateType previousStateType, StateType currentStateType) {
-		Vector<Room> rooms = roomsSwitch(previousStateType);
-		for(Room room : rooms){
-			remove(room);
+		removeAll();
+		add(floor);
+		add(description);
+		add(visualiser);
+		add(up);
+		add(down);
+		add(bar);
+		for(Button button: buttons){
+			add(button);
 		}
+		for(StateButton stateButton: stateButtons){
+			add(stateButton);
+		}
+//		for(Room room : roomsSwitch(previousStateType)){
+//			remove(room);
+//		}
 		
-		rooms = roomsSwitch(currentStateType);
-		for(Room room : rooms){
+		for(Room room : roomsSwitch(currentStateType)){
 			add(room);
 		}
+		if(VERBOSE) System.out.println("Room switched on display");
 	}
 
 	/*
@@ -321,6 +334,7 @@ public class Satisficer extends GraphicsProgram {
 		selected = getElementAt(e.getX(),e.getY());
 		if(selected instanceof Button) return;
 		if(selected instanceof Room){
+			selected.sendToFront();
 			Room room = (Room) selected;
 			GPoint pt = room.getLocalPoint(e.getX(),e.getY());
 			GObject selectedInnerObject = room.getElementAt(pt.getX(),pt.getY());
@@ -465,12 +479,17 @@ public class Satisficer extends GraphicsProgram {
 		}
 	}
 	
+	double OVERLAP = .01;
 	private boolean overlap(Room a, Room b){
-		boolean overlapbX = b.getX() > a.getX() && b.getX() < a.getX() + a.getWidth();
-		boolean overlapaX = a.getX() > b.getX() && a.getX() < b.getX() + b.getWidth();
-		boolean overlapbY = b.getY() > a.getY() && b.getY() < a.getY() + a.getHeight();
-		boolean overlapaY = a.getY() > b.getY() && a.getY() < b.getY() + b.getHeight();
+		boolean overlapbX = b.getX() > a.getX() + OVERLAP && b.getX() + OVERLAP < a.getX() + a.getWidth();
+		boolean overlapaX = a.getX() > b.getX() + OVERLAP && a.getX() + OVERLAP < b.getX() + b.getWidth();
+		boolean overlapbY = b.getY() > a.getY() + OVERLAP && b.getY() + OVERLAP < a.getY() + a.getHeight();
+		boolean overlapaY = a.getY() > b.getY() + OVERLAP && a.getY() + OVERLAP < b.getY() + b.getHeight();
 		return (overlapbX || overlapaX) && (overlapbY || overlapaY);
+	}
+	private boolean inBounds(Room a){
+		return a.getX() >= floor.getX() && a.getX() + a.getWidth() < floor.getX()+floor.getWidth()
+		&& a.getY() >= floor.getY() && a.getY() + a.getHeight() < floor.getY()+floor.getHeight(); 
 	}
 	
 	private void switchToCurrent(){
@@ -509,7 +528,8 @@ public class Satisficer extends GraphicsProgram {
 		
 		bar.setFlags(buttons, roomsSwitch(state), selectedRooms);
 		visualiser.update(getSelectedConstraints(roomsSwitch(state)), roomsSwitch(state));
-		
+		if(DO_NOT_SAVE_PLANS_WITH_OVERLAPS && overlapExists()) return;
+		if(DO_NOT_SAVE_PLANS_OUTSIDE_BOUNDS && planOutsideBounds()) return;
 		if (getScore(true, null, StateType.CURRENT) >= highScore) {
 			highScore = getScore(true, null, StateType.CURRENT);
 			deepCloneFromCurrent(StateType.HIGHEST);
@@ -537,6 +557,29 @@ public class Satisficer extends GraphicsProgram {
 		if(getScore(TOTAL, flagType, StateType.CURRENT) > getScore(TOTAL, flagType, stateType)) return true;
 		if(getScore(TOTAL, flagType, StateType.CURRENT) == getScore(TOTAL, flagType, stateType)){
 			return getScore(true, null, StateType.CURRENT) > getScore(true, null, stateType);
+		}
+		return false;
+	}
+	
+	private boolean overlapExists(){
+		for(Room room: currentRooms){
+			for(Room room2: currentRooms){
+				if(!room.equals(room2) && overlap(room, room2)) {
+					if(VERBOSE) System.out.println("Overlap found");
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean planOutsideBounds(){
+		for(Room room: currentRooms){
+			//if(!floor.getBounds().intersects(room.getBounds())) {
+			if(!inBounds(room)){
+				if(VERBOSE) System.out.println("Outside Bounds.");
+				return true;
+			}
 		}
 		return false;
 	}

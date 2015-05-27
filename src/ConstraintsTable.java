@@ -8,6 +8,8 @@ import acm.graphics.GLabel;
 public class ConstraintsTable extends GCompound {
 	int INITIAL_Y = 20;
 	int INITIAL_X = 120;
+	Color color1 = Color.GREEN;
+	Color color2 = Color.RED;
 
 	public ConstraintsTable(Vector<Constraint> constraints, Vector<Room> rooms) {
 		this.offset_y = 0;
@@ -40,9 +42,16 @@ public class ConstraintsTable extends GCompound {
 	private void updateSatisfaction(Constraint constraint, int count, Vector<Room> rooms) {
 		GLabel label;
 		if (constraint instanceof AdjacencyConstraint) {
-			String satisfaction = Double.toString(((AdjacencyConstraint)constraint).evaluate(rooms));
+			double satisfactionDouble = ((AdjacencyConstraint)constraint).evaluate(rooms);
+			String satisfaction = Double.toString((Math.floor(satisfactionDouble * 100) / 100));
 			label = new GLabel(satisfaction);
 			label.setLocation(INITIAL_X, offset_y + (INITIAL_Y*count));
+			float ratio = (float) 1.0 - (float) satisfactionDouble;
+	        int red = (int) (color2.getRed() * ratio + color1.getRed() * (1 - ratio));
+	        int green = (int) (color2.getGreen() * ratio + color1.getGreen() * (1 - ratio));
+	        int blue = (int) (color2.getBlue() * ratio + color1.getBlue() * (1 - ratio));
+	        Color stepColor = new Color(red, green, blue);
+			label.setColor(stepColor);
 			add(label);
 		} else if (constraint instanceof SizeConstraint) {
 			if (((SizeConstraint) constraint).satisfied()) {
