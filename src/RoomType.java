@@ -14,13 +14,13 @@ import java.awt.Color;
 
 
 public enum RoomType {
-	FACULTY ("FACULTY", Color.GREEN, 20.0 * Math.sqrt(10), 12.0 * Math.sqrt(10), 0, 0, 1, 5), //150 sq.ft
+	FACULTY ("FACULTY", Color.GREEN, 25.0 * Math.sqrt(10), 12.0 * Math.sqrt(10), 0, 0, 1, 5), //180 sq.ft
 	MEETING ("MEETING", Color.YELLOW, 20.0 * Math.sqrt(10), 16.0 * Math.sqrt(10), 1, 0, 1, 5), //200 sq. ft
-	AUDITORIUM ("AUD", Color.CYAN, 80.0 * Math.sqrt(10), 60.0 * Math.sqrt(10), 2, 1, 0, 0), //3000
-	CAFETERIA ("CAFE", Color.GRAY, 64.0 * Math.sqrt(10), 40.0 * Math.sqrt(10), 3, 1, 0, 0), //1600
+	AUDITORIUM ("AUD", Color.CYAN, 80.0 * Math.sqrt(10), 50.0 * Math.sqrt(10), 2, 1, 0, 0), //2500
+	CAFETERIA ("CAFE", Color.GRAY, 40.0 * Math.sqrt(10), 30 * Math.sqrt(10), 3, 1, 0, 0), //750
 	SMALLCLASSROOM ("SmallC", Color.ORANGE, 40.0 * Math.sqrt(10), 20.0 * Math.sqrt(10), 4, 0, 1, 5), //500
 	LARGECLASSROOM ("LargeC", Color.MAGENTA, 40.0 * Math.sqrt(10), 32.0 * Math.sqrt(10), 5, 0, 1, 2), //800
-	MEP ("MEP", Color.DARK_GRAY, 40.0 * Math.sqrt(10), 40.0 * Math.sqrt(10), 6, 1, 0, 0); //1000
+	MEP ("MEP", Color.DARK_GRAY, 40.0 * Math.sqrt(10), 30.0 * Math.sqrt(10), 6, 1, 0, 0); //750
 	
 	private final String label;
 	private final Color color;

@@ -26,7 +26,7 @@ import javax.swing.JPanel;
 public class Satisficer extends GraphicsProgram {
 	
 	//Settings
-	boolean TREATMENT = false; //Just change this between treatment and control
+	boolean TREATMENT = true; //Just change this between treatment and control
 	boolean AFFINITY_MATRIX = true; //Will only show or not in treatment condition
 	boolean SELECTED_FLAGS = true;
 	boolean ADDITIONAL_HIGH_SCORES = true;
