@@ -52,7 +52,7 @@ public class Satisficer extends GraphicsProgram {
 	int BUTTON_WIDTH = 46;
 	int BUTTON_HEIGHT = 30;
 	int BUTTON_SPACING = 9;
-	int BUTTON_OFFSET_BOTTOM = 35;
+	int BUTTON_OFFSET_BOTTOM = 30;
 	int BUTTON_OFFSET_LEFT = 300;
 	int ROOM_OFFSET_BOTTOM = 10;
 	int DESCRIPTION_OFFSET_BOTTOM = 10;
