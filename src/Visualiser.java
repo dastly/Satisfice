@@ -20,8 +20,8 @@ public class Visualiser extends GCompound {
 	int UP = 0, DOWN = 1; // for scroll buttons
 	
 	int affinityMatrix[][] = { //also in Adjacency Constraint
-		      { 1, -2, -2,  1, -2, -2, -1},
-		      {-2,  1, -1,  1,  2,  2,  0},
+		      { 1, 0, -2,  1, -2, -2, -1},
+		      { 0,  1, -1,  1,  2,  2,  0},
 		      {-2,  1,  1,  2,  2,  2,  0},
 		      { 1,  1,  2,  1,  2,  2,  0},
 		      {-2,  2,  2,  2,  1,  2,  0},

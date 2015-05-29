@@ -29,7 +29,7 @@ public class Satisficer extends GraphicsProgram {
 	boolean TREATMENT = true; //Just change this between treatment and control
 	boolean AFFINITY_MATRIX = true; //Will only show or not in treatment condition
 	boolean SELECTED_FLAGS = true;
-	boolean ADDITIONAL_HIGH_SCORES = true;
+	boolean ADDITIONAL_HIGH_SCORES = false;
 	boolean VERBOSE = true; //change if you want
 	boolean RED_FOR_OVERLAP = true; //change if you want
 	boolean DO_NOT_SAVE_PLANS_WITH_OVERLAPS = true; 

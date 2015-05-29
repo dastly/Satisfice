@@ -6,8 +6,8 @@ public class AdjacencyConstraint extends Constraint {
 	double DROP_OFF_FACTOR = 40.0; //2*CELL_WIDTH, or 10 ft.
 	double HIGH_AFFINITY = 6.0;
 	int affinityMatrix[][] = { //Also in visualizer
-		      { 1, -2, -2,  1, -2, -2, -1},
-		      {-2,  1, -1,  1,  2,  2,  0},
+		      { 1, 0, -2,  1, -2, -2, -1},
+		      {0,  1, -1,  1,  2,  2,  0},
 		      {-2,  1,  1,  2,  2,  2,  0},
 		      { 1,  1,  2,  1,  2,  2,  0},
 		      {-2,  2,  2,  2,  1,  2,  0},

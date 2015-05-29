@@ -14,7 +14,7 @@ import java.awt.Color;
 
 
 public enum RoomType {
-	FACULTY ("FACULTY", Color.GREEN, 25.0 * Math.sqrt(10), 12.0 * Math.sqrt(10), 0, 0, 1, 5), //180 sq.ft
+	FACULTY ("FACULTY", Color.GREEN, 24.0 * Math.sqrt(10), 12.0 * Math.sqrt(10), 0, 0, 1, 5), //180 sq.ft
 	MEETING ("MEETING", Color.YELLOW, 20.0 * Math.sqrt(10), 16.0 * Math.sqrt(10), 1, 0, 1, 5), //200 sq. ft
 	AUDITORIUM ("AUD", Color.CYAN, 80.0 * Math.sqrt(10), 50.0 * Math.sqrt(10), 2, 1, 0, 0), //2500
 	CAFETERIA ("CAFE", Color.GRAY, 40.0 * Math.sqrt(10), 30 * Math.sqrt(10), 3, 1, 0, 0), //750
