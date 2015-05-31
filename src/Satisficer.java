@@ -33,7 +33,7 @@ public class Satisficer extends GraphicsProgram {
 	boolean VERBOSE = true; //change if you want
 	boolean RED_FOR_OVERLAP = true; //change if you want
 	boolean DO_NOT_SAVE_PLANS_WITH_OVERLAPS = true; 
-	boolean DO_NOT_SAVE_PLANS_OUTSIDE_BOUNDS = true;
+	boolean DO_NOT_SAVE_PLANS_OUTSIDE_BOUNDS = false;
 	boolean DO_NOT_SAVE_PLANS_OUTSIDE_GRAY_BOUNDS = true;
 	
 	//Constants
@@ -570,6 +570,8 @@ public class Satisficer extends GraphicsProgram {
 			deepCloneFromCurrent(StateType.HIGHEST_COUNT);
 			if(VERBOSE) System.out.println("Highest COUNT set: "+highCountScore);
 		}
+		System.out.println("HIGH SCORE: " + highScore);
+		System.out.println("CURRENT SCORE: " + getScore(true, null, StateType.CURRENT));
 	}
 	
 	//Does not work for current.  Calculates based off of saved rooms
@@ -597,7 +599,7 @@ public class Satisficer extends GraphicsProgram {
 		for(Room room: currentRooms){
 			//if(!floor.getBounds().intersects(room.getBounds())) {
 			if(!inBounds(room)){
-				if(VERBOSE) System.out.println("Outside Bounds.");
+				//if(VERBOSE) System.out.println("Outside Bounds.");
 				return true;
 			}
 		}

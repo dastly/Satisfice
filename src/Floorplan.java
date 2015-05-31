@@ -11,7 +11,7 @@ public class Floorplan extends GCompound {
 	double FLOOR_WIDTH = CELL_WIDTH * NUM_CELLS;
 	double FLOOR_HEIGHT = CELL_WIDTH * NUM_CELLS;
 	double FLOOR_MID_WIDTH = CELL_WIDTH * NUM_CELLS/2 + CELL_WIDTH;
-	double FLOOR_MID_HEIGHT = CELL_WIDTH * NUM_CELLS/2 + CELL_WIDTH;
+	double FLOOR_MID_HEIGHT = CELL_WIDTH * ((NUM_CELLS/2)-2) + CELL_WIDTH;
 	
 	GPoint[] vertices = {new GPoint(0, 0),
 			new GPoint(0, FLOOR_HEIGHT),
